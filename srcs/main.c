@@ -19,7 +19,7 @@ void	lexer()
 	 *
 	 * RD -> << = HD  |  < = inFile  |  >> = append  |  > = outFile
 	 * */
-}
+}{}
 
 
 int	main(int ac, char **av, char *env[])

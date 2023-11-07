@@ -6,11 +6,11 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 19:53:53 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/02 21:45:55 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/07 16:48:30 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../include/minishell.h"
 
 bool	special_char(char corr)
 {

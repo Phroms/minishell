@@ -6,17 +6,17 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:21:33 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/06 20:17:11 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/07 17:52:13 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
-#include <signal.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <stdio.h>
-#include <stdlib.h>
+//#include <signal.h>
+//#include <readline/readline.h>
+//#include <readline/history.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
 void	signal_ctrlC(int sig)
 {
@@ -24,7 +24,7 @@ void	signal_ctrlC(int sig)
 	{
 		printf("\n");
 		rl_on_new_line(); // esto indica que el cursor debe moverse a una nueva linea;
-		//rl_replace_line("", 0); // reemplaza el antiguo texto con uno nuevo
+		rl_replace_line("", 0); // reemplaza el antiguo texto con uno nuevo
 		rl_redisplay(); // muestra lo escrito por la funcion anterior.
 	}
 }
@@ -35,9 +35,10 @@ void	signal_ctrlD(void)
 	signal(SIGINT, signal_ctrlC);
 }
 
-/*int	main()
+int	main()
 {
 	signal_ctrlD();
+	signal_ctrlC(SIGINT);
 
 	char *input;
 	while (1)
@@ -50,4 +51,4 @@ void	signal_ctrlD(void)
 		}
 	}
 	return (0);
-}*/
+}

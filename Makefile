@@ -6,7 +6,7 @@
 #    By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/30 18:51:28 by agrimald          #+#    #+#              #
-#    Updated: 2023/11/03 13:04:57 by agrimald         ###   ########.fr        #
+#    Updated: 2023/11/07 21:37:14 by agrimald         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,9 @@ LIBFT = include/libft/libft.a
 SRCDIR = src
 OBJDIR = obj
 
-SRC = env.c main.c
+SRC = src/main.c src/utils/env.c src/signals/signals.c src/parse/check_errors.c \
+	  src/lexer/tokens_lexer.c src/commands/echo.c src/commands/pwd.c
+
 OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(wildcard $(SRCDIR)/*.c))
 
 #OLD_MAKE = /usr/bin/make3.81 #make
@@ -27,9 +29,9 @@ all: $(NAME)
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 			@printf "Compiling objects\n"
 			@mkdir -p $(@D)
-			@gcc $(CFLAGS) -c $< -o $@ -Iinclude/libft
+			@gcc $(CFLAGS) -Iinclude/libft -c $< -o $@
 
-$(NAME): $(OBJECTS) Makefile
+$(NAME): $(OBJECTS) $(LIBFT) Makefile
 			@mkdir -p $(@D)
 			@gcc $(CFLAGS) -o $@ $(OBJECTS) -Linclude/libft -lft
 			@printf "\nCompiled successfully!\n"

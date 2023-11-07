@@ -6,11 +6,11 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:20:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/06 17:28:10 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/07 17:41:09 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../include/minishell.c"
+//#include "../../include/minishell.c"
 
 #include <limits.h>
 #include <stdio.h>
@@ -29,10 +29,10 @@ void	pwd(void)
 	}
 }
 
-/*int main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	(void)argv;
 	if (argc == 2)
 		pwd();
 	return (0);
-}*/
+}

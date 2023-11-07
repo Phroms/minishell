@@ -6,16 +6,16 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 11:42:36 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/03 13:19:22 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/07 17:50:30 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
-#include <stdbool.h>
+/*#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <stdlib.h>*/
 
 int	ft_strlen(const char *s)
 {

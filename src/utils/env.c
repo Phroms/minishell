@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:19:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/07 16:49:17 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/08 20:01:51 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ char	*ft_getenv(char *variable, char **env)
 	}
 	return (NULL);
 }
-
+/*
 int main(int argc, char **argv, char **envp) 
 {
     if (argc < 2)
@@ -87,4 +87,4 @@ int main(int argc, char **argv, char **envp)
     }
 
     return 0;
-}
+}*/

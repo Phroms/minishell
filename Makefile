@@ -6,34 +6,36 @@
 #    By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/30 18:51:28 by agrimald          #+#    #+#              #
-#    Updated: 2023/11/07 21:37:14 by agrimald         ###   ########.fr        #
+#    Updated: 2023/11/08 20:40:16 by agrimald         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 CFLAGS = -Wall -Werror -Wextra -fsanitize=address
 
-LIBFT = include/libft/libft.a
-SRCDIR = src
-OBJDIR = obj
+INCS = -I./include/ -I./include/Libft -I$(HOME)/.brew/opt/readline/include
+LIBFTA = -L./include/Libft -lft
+READLINE = -L$(HOME)/.brew/opt/readline/lib -lreadline 
+SRCDIR = src/
+OBJDIR = obj/
 
-SRC = src/main.c src/utils/env.c src/signals/signals.c src/parse/check_errors.c \
-	  src/lexer/tokens_lexer.c src/commands/echo.c src/commands/pwd.c
+SRC_L = main.c utils/env.c signals/signals.c	 
 
-OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(wildcard $(SRCDIR)/*.c))
+SRC = $(addprefix $(SRCDIR), $(SRC_L))
+OBJECTS = $(addprefix $(OBJDIR), $(SRC:.c=.o))
 
 #OLD_MAKE = /usr/bin/make3.81 #make
 
 all: $(NAME)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)%.o: %.c
 			@printf "Compiling objects\n"
 			@mkdir -p $(@D)
-			@gcc $(CFLAGS) -Iinclude/libft -c $< -o $@
+			@gcc $(CFLAGS) $(INCS) -c $< -o $@
 
-$(NAME): $(OBJECTS) $(LIBFT) Makefile
+$(NAME): $(OBJECTS) Makefile
 			@mkdir -p $(@D)
-			@gcc $(CFLAGS) -o $@ $(OBJECTS) -Linclude/libft -lft
+			@gcc $(CFLAGS) -o $@ $(OBJECTS) $(LIBFTA) $(READLINE)
 			@printf "\nCompiled successfully!\n"
 
 fclean: clean

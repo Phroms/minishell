@@ -6,17 +6,17 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/07 21:37:16 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/08 20:40:18 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
  #define MINISHELL_H
 
- #include <libft.h>
- #include <readline/readline.h>  //tengo que descargar la libreria.
- #include <readline/history.h>
+ #include "libft.h"
  #include <stdio.h>
+ #include <readline/readline.h>
+ #include <readline/history.h>
  #include <stdlib.h>
  #include <string.h>
  #include <signal.h>
@@ -84,7 +84,7 @@ int		check_input(char *str);
  *					  SIGNALS						 *
  *****************************************************/
 
-void	signal_ctrlC(int sig);
-void	signal_ctrlD(void);
+void	signal_ctrl_d(void);
+void	signal_ctrl_c(int sig);
 
 #endif

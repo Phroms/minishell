@@ -6,11 +6,13 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:19:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/08 20:01:51 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 19:58:32 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+//#include "../../include/minishell.h"
+#include "minishell.h"
+
 
 size_t	read_variable(char *or_env)
 {
@@ -60,8 +62,8 @@ char	*ft_getenv(char *variable, char **env)
 	}
 	return (NULL);
 }
-/*
-int main(int argc, char **argv, char **envp) 
+
+/*int main(int argc, char **argv, char **envp) 
 {
     if (argc < 2)
 	{

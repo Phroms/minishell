@@ -6,13 +6,13 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 15:07:55 by agrimald          #+#    #+#             */
-/*   Updated: 2023/09/18 21:37:01 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 17:04:56 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-size_t	ft_strlen(const char *s)
+int	ft_strlen(const char *s)
 {
 	size_t	i;
 

@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:00:02 by agrimald          #+#    #+#             */
-/*   Updated: 2023/10/31 18:12:45 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 17:06:16 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ void	*ft_memmove(void *dst, const void *src, size_t len);
 void	*ft_calloc(size_t number, size_t size);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strrchr(const char *s, int c);
-size_t	ft_strlen(const char *s);
-int		ft_strncmp(char *s1, char *s2, size_t n);
+int		ft_strlen(const char *s);
+int		ft_strncmp(char *s1, char *s2, int n);
 int		ft_strcmp(char *s1, char *s2);
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);

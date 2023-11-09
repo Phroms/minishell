@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/08 20:40:18 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 22:00:40 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
  #define MINISHELL_H
 
  #include "libft.h"
+ #include <fcntl.h>
+ #include <stdlib.h>
  #include <stdio.h>
  #include <readline/readline.h>
  #include <readline/history.h>
- #include <stdlib.h>
  #include <string.h>
  #include <signal.h>
  #include <ctype.h>
@@ -84,7 +85,7 @@ int		check_input(char *str);
  *					  SIGNALS						 *
  *****************************************************/
 
-void	signal_ctrl_d(void);
+void	signals(void);
 void	signal_ctrl_c(int sig);
 
 #endif

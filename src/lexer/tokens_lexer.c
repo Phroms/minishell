@@ -6,11 +6,13 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 19:53:53 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/07 16:48:30 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 17:21:11 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+//#include "../../include/minishell.h"
+#include "minishell.h"
+
 
 bool	special_char(char corr)
 {
@@ -38,10 +40,7 @@ size_t	get_char_special(char *token, char next_special_char)
 			token++;
 			size++;
 		}
-	}
-	else
-	{
-		if (*token && *token != next_especial_char)
+		else if (*token && *token != next_special_char)
 		{
 			size++;
 			token++;
@@ -54,8 +53,7 @@ char	get_next_char(char *token)
 {
 	while (*token)
 	{
-		if (*token == '|' || *token == '>' \
-				*token == '<' || *token == ';')
+		if (*token == '|' || *token == '>' || *token == '<' || *token == ';')
 			return (*token);
 		token++;
 	}

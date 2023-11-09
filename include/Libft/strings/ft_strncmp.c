@@ -6,15 +6,15 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 15:13:40 by agrimald          #+#    #+#             */
-/*   Updated: 2023/09/19 18:47:28 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 17:05:34 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-int	ft_strncmp(char *s1, char *s2, size_t n)
+int	ft_strncmp(char *s1, char *s2, int n)
 {
-	size_t	i;
+	int	i;
 
 	i = 0;
 	while (i < n && (*s1 != '\0' || *s2 != '\0'))

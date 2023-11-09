@@ -6,11 +6,12 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 13:20:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/07 17:41:09 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 21:00:54 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include "../../include/minishell.c"
+#include "minishell.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -24,15 +25,15 @@ void	pwd(void)
 	pwd = getcwd(NULL, 0);
 	if (pwd != NULL)
 	{
-		printf("%s", pwd);
+		printf("%s\n", pwd);
 		free(pwd);
 	}
 }
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
 	(void)argv;
 	if (argc == 2)
 		pwd();
 	return (0);
-}
+}*/

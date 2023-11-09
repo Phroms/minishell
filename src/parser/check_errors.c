@@ -6,11 +6,13 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 20:14:52 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/07 16:48:44 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 17:21:51 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+//#include "../../include/minishell.h"
+#include "minishell.h"
+
 
 int	is_rd(int c)
 {

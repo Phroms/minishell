@@ -6,18 +6,19 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 11:42:36 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/07 17:50:30 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/09 22:00:31 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+//#include "../../include/minishell.h"
+#include "minishell.h"
 
 /*#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>*/
 
-int	ft_strlen(const char *s)
+/*int	ft_strlen(const char *s)
 {
 	size_t	i;
 
@@ -43,7 +44,7 @@ int	ft_strncmp(char *s1, char *s2, size_t n)
 		i++;
 	}
 	return (0);
-}
+}*/
 
 int	echo(char **args)
 {
@@ -60,24 +61,29 @@ int	echo(char **args)
 	}
 	while (*args != NULL)
 	{
-		if (printf("%s", *args) != ft_strlen(*args))
+		printf("%s", *args);
+		args++;
+		if (*args != NULL)
+			printf(" ");
+		/*if (printf("%s", *args) != ft_strlen(*args))
 			return (EXIT_FAILURE);
 		if (ft_strlen(*args) != 0 && *(args + 1) != NULL)
 			if (printf(" ") != ft_strlen(" "))
 				return (EXIT_FAILURE);
-		args++;
+		args++;*/
 	}
 	if (print_line)
-		if (printf("\n") != ft_strlen("\n"))
-			return (EXIT_FAILURE);
+		printf("\n");
+		/*if (printf("\n") != ft_strlen("\n"))
+			return (EXIT_FAILURE);*/
 	return (EXIT_SUCCESS);
 }
 
-int	main(int argc, char **argv)
+/*int	main(int argc, char **argv)
 {
 	(void)argc;
 	return echo(argv + 1);
-}
+}*/
 
 	/*	TEST MANUAL */
 

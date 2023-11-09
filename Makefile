@@ -6,7 +6,7 @@
 #    By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/30 18:51:28 by agrimald          #+#    #+#              #
-#    Updated: 2023/11/08 20:40:16 by agrimald         ###   ########.fr        #
+#    Updated: 2023/11/09 22:00:42 by agrimald         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ READLINE = -L$(HOME)/.brew/opt/readline/lib -lreadline
 SRCDIR = src/
 OBJDIR = obj/
 
-SRC_L = main.c utils/env.c signals/signals.c	 
+SRC_L = main.c utils/env.c signals/signals.c commands/echo.c commands/pwd.c \
+		lexer/tokens_lexer.c parser/check_errors.c 
 
 SRC = $(addprefix $(SRCDIR), $(SRC_L))
 OBJECTS = $(addprefix $(OBJDIR), $(SRC:.c=.o))

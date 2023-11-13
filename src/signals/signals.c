@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:21:33 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/09 18:22:51 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/13 19:33:49 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,3 @@ void	signals(void)
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, signal_ctrl_c);
 }
-

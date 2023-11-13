@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/09 21:50:48 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/13 19:25:10 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ int	main()
 
 	char	*input;
 	char	*text;
+	char	*args[3];
 
 	while (1)
 	{
@@ -49,7 +50,10 @@ int	main()
 			else if (ft_strncmp(input, "echo ", 5) == 0)
 			{
 				text = input + 5;
-				echo(&text);
+				args[0] = "echo";
+				args[1] = text;
+				args[2] = NULL;
+				echo(args);
 			}
             free(input);
 		}

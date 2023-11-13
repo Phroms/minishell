@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 20:14:52 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/09 17:21:51 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/13 20:02:00 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,15 +65,18 @@ int	check_input(char *str)
 	return (0);
 }
 
-/*int main() {
+/*int main() 
+{
     char str[] = "ls >output.txt|grep pattern";
     int result = check_input(str);
 
-    if (result == 0) {
+    if (result == 0) 
+	{
         printf("No hay errores de sintaxis en la cadena.\n");
-    } else {
+    }
+   	else
+   	{
         printf("Se encontraron errores de sintaxis en la cadena.\n");
     }
-
     return 0;
 }*/

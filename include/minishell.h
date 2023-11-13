@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/13 20:02:09 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/13 21:58:14 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,20 @@ typedef struct s_env
 {
 	char	*env_cpy;	
 }t_env;
+
+typedef struct s_word
+{
+	char	*word;
+	size_t	len;
+	int		type;
+}t_word;
+
+typedef struct s_tokens
+{
+	t_word	*words;
+	size_t	size;
+	t_env	**env;
+}t_tokens;
 
 
 /*****************************************************

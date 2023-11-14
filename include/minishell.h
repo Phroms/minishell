@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/14 16:38:03 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/14 17:40:39 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,5 +118,11 @@ t_tokens	*init_token(t_env **env);
 int			add_words(t_tokens *tokens, char *str, size_t len, int type);
 void		free_tokens(t_tokens *tokens);
 
+	/*--------CHECK_ERRORS--------*/
+
+int			is_rd(int c);
+int			is_redirection(char *str, int i);
+int			check_rd(char *str, int i);
+int			check_input(char *str);
 
 #endif

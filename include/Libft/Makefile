@@ -6,7 +6,7 @@
 #    By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 19:07:28 by agrimald          #+#    #+#              #
-#    Updated: 2023/09/18 18:00:15 by agrimald         ###   ########.fr        #
+#    Updated: 2023/11/14 17:42:06 by agrimald         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ STRINGS_SRC = ft_strlen.c ft_strlcpy.c ft_toupper.c ft_tolower.c ft_strncmp.c \
 			  ft_strcmp.c
 
 MEMORY_SRC = ft_bzero.c ft_calloc.c ft_memcpy.c ft_memcpy.c ft_memchr.c \
-			 ft_memcmp.c ft_memset.c ft_memmove.c
+			 ft_memcmp.c ft_memset.c ft_memmove.c ft_realloc.c
 
 LIBFT_FD_SRC = ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c
 

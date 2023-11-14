@@ -1,32 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   ft_realloc.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/03 15:07:55 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/14 17:59:46 by agrimald         ###   ########.fr       */
+/*   Created: 2023/11/14 17:35:57 by agrimald          #+#    #+#             */
+/*   Updated: 2023/11/14 18:08:10 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-int	ft_strlen(const char *s)
+void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
 {
-	size_t	i;
+	void	*new_ptr;
+	size_t	copy_size;
 
-	if (!s)
-		return (0);
-	i = 0;
-	while (*s++)
-		i++;
-	return (i);
+	new_ptr = malloc(new_size);
+	if (!new_ptr)
+	{
+		free(ptr);
+		return (NULL);
+	}
+	if (old_size < new_size)
+		copy_size = old_size;
+	else
+		copy_size = new_size;
+	ft_memcpy(new_ptr, ptr, copy_size);
+	free(ptr);
+	return (new_ptr);
 }
-/*
-int main(void) {
-    char *cadena = "Hola mundo!";
-    size_t longitud = strlen(cadena);
-    printf("La longitud de la cadena \"%s\" es %zu\n", cadena, longitud);
-    return 0;
-}*/

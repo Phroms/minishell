@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 21:43:15 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/14 16:37:43 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/14 17:46:03 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 
 	if (!str)
 		return (0);
-	tokens->words = realloc(tokens->words, (tokens->size + 1) * sizeof(t_word));
+	tokens->words = ft_realloc(tokens->words, (tokens->size + 1) * sizeof(t_word));
 	if (!tokens->words)
 		return (0);
 	new_word = &tokens->words[tokens->size];

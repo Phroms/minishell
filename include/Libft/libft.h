@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:00:02 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/09 17:06:16 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/14 17:41:48 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	*ft_memchr(const void *s, int c, size_t n);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
 void	*ft_memmove(void *dst, const void *src, size_t len);
 void	*ft_calloc(size_t number, size_t size);
+void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strrchr(const char *s, int c);
 int		ft_strlen(const char *s);

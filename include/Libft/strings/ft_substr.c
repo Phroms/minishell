@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 18:45:51 by agrimald          #+#    #+#             */
-/*   Updated: 2023/09/18 21:42:52 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/14 18:05:53 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,31 @@
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	char	*ptrs;
+	size_t	s_len;
+	char	*s_str;
 	size_t	i;
 
-	if (start >= ft_strlen(s))
-		return (ft_strdup(""));
-	if (start + len > ft_strlen(s))
-		len = ft_strlen(s) - start;
-	ptrs = (char *) malloc(sizeof(char) * (len + 1));
-	if (ptrs == NULL)
-	{
-		errno = ENOMEM;
+	if (!s)
 		return (NULL);
-	}
+	s_len = ft_strlen(s);
+	if (start >= s_len)
+		return (NULL);
+	if (start + len > s_len)
+		len = s_len - start;
+	s_str = (char *)malloc((len + 1) * sizeof(char));
+	if (!s_str)
+		return (NULL);
+	while (*s && start--)
+		s++;
 	i = 0;
-	while (i < len && s[i])
+	while (*s && i < len)
 	{
-		ptrs[i] = s[i + start];
+		s_str[i] = *s;
 		i++;
+		s++;
 	}
-	ptrs[i] = '\0';
-	return (ptrs);
+	s_str[i] = '\0';
+	return (s_str);
 }
 /*int main()
 {

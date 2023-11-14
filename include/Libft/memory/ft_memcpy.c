@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/05 20:55:17 by agrimald          #+#    #+#             */
-/*   Updated: 2023/09/18 21:46:11 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/14 16:42:01 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 	i = 0;
 	while (i < n)
 	{
-		if (chr_dst == NULL && chr_src == NULL)
-			return (chr_src);
+		if (dst == NULL && src == NULL)
+			return (dst);
 		chr_dst[i] = chr_src[i];
 		i++;
 	}
-	return (chr_dst);
+	return (dst);
 }

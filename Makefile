@@ -6,7 +6,7 @@
 #    By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/30 18:51:28 by agrimald          #+#    #+#              #
-#    Updated: 2023/11/13 20:02:07 by agrimald         ###   ########.fr        #
+#    Updated: 2023/11/14 13:19:12 by agrimald         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ SRCDIR = src/
 OBJDIR = obj/
 
 SRC_L = main.c utils/env.c signals/signals.c commands/echo.c commands/pwd.c \
-		lexer/tokens_lexer.c parser/check_errors.c 
+		lexer/tokens_lexer.c parser/check_errors.c parser/token_manager.c 
 
 SRC = $(addprefix $(SRCDIR), $(SRC_L))
 OBJECTS = $(addprefix $(OBJDIR), $(SRC:.c=.o))

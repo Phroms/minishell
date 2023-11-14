@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 19:53:53 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/13 17:19:58 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/14 12:58:42 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@ bool	special_char(char corr)
 	if (corr == '>')
 		return (true);
 	if (corr == '<')
-		return (true);
-	if (corr == ';')
 		return (true);
 	//if (corr == '&' && next && next == '&') bonuss;
 	return (false);
@@ -53,7 +51,7 @@ char	get_next_char(char *token)
 {
 	while (*token)
 	{
-		if (*token == '|' || *token == '>' || *token == '<' || *token == ';')
+		if (*token == '|' || *token == '>' || *token == '<')
 			return (*token);
 		token++;
 	}

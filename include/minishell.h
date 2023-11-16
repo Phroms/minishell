@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/14 17:40:39 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/16 22:02:47 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
  #include <unistd.h>
  #include <stdbool.h>
 
-
 typedef struct s_env
 {
 	char	*env_cpy;	
@@ -43,7 +42,9 @@ typedef struct s_tokens
 {
 	t_word	*words;
 	size_t	size;
+	//t_word	*first;
 	t_env	**env;
+	int		error;
 }t_tokens;
 
 
@@ -79,10 +80,10 @@ int		echo(char **args);
 
 	/*--------TOKENS_LEXER--------*/
 
-bool	special_char(char corr);
+/*bool	special_char(char corr);
 size_t	get_char_special(char *token, char next_special_char);
 char	get_next_char(char *token);
-bool	search_char(char *token);
+bool	search_char(char *token);*/
 
 /*****************************************************
  *					  PARSER						 *
@@ -90,10 +91,10 @@ bool	search_char(char *token);
 
 	/*--------CHECK_ERRORS--------*/
 
-int		is_rd(int c);
+/*int		is_rd(int c);
 int		is_redirection(char *str, int i);
 int		check_rd(char*str, int i);
-int		check_input(char *str);
+int		check_input(char *str);*/
 
 /*****************************************************
  *					  SIGNALS						 *
@@ -117,6 +118,7 @@ int main();
 t_tokens	*init_token(t_env **env);
 int			add_words(t_tokens *tokens, char *str, size_t len, int type);
 void		free_tokens(t_tokens *tokens);
+int			matrixify(t_tokens *tokens);
 
 	/*--------CHECK_ERRORS--------*/
 
@@ -124,5 +126,26 @@ int			is_rd(int c);
 int			is_redirection(char *str, int i);
 int			check_rd(char *str, int i);
 int			check_input(char *str);
+
+	/*--------TOKEN_ANALYSIS--------*/
+
+int			special_char(char c);
+int			dst_dots(char *str, char dot);
+int			is_marks(t_tokens *tokens, char *str);
+int			is_space(t_tokens *tokens, char *str);
+
+	/*--------TOKENS_OPERATIONS--------*/
+
+void		print_wrd_format(char *format_str, t_word word);
+void		print_tokens(t_tokens *tokens);
+int			free_tokens_memory(t_tokens *tokens);
+
+	/*--------PARSER--------*/
+
+int			break_token(t_tokens *tokens, char *str);
+int			is_normal_ch(char ch);
+int			string_tokens(t_tokens *tokens, char *str);
+int			parse_string(t_tokens *tokens, char *str);
+int			parser(t_tokens *tokens);
 
 #endif

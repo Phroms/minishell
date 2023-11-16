@@ -6,16 +6,17 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 21:43:15 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/14 19:20:43 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/16 22:02:44 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 /*#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>*/
+#include <stdio.h>
+#include <sys/errno.h>
 
-/*typedef struct s_env
+typedef struct s_env
 {
 	char	*env_cpy;
 }t_env;
@@ -34,6 +35,20 @@ typedef struct s_tokens
 	t_env	**env;
 }t_tokens;
 
+void	*ft_memset(void *b, int c, size_t len)
+{
+	unsigned char	*ptrs;
+	size_t			i;
+
+	ptrs = (unsigned char *)b;
+	i = 0;
+	while (i < len)
+	{
+		ptrs[i++] = (unsigned char)c;
+	}
+	return (ptrs);
+}
+
 void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
 	size_t			i;
@@ -51,6 +66,40 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 		i++;
 	}
 	return (chr_dst);
+}
+
+void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
+{
+	void	*new_ptr;
+	size_t	copy_size;
+
+	new_ptr = malloc(new_size);
+	if (!new_ptr)
+	{
+		free(ptr);
+		return (NULL);
+	}
+	if (old_size < new_size)
+		copy_size = old_size;
+	else
+		copy_size = new_size;
+	ft_memcpy(new_ptr, ptr, copy_size);
+	free(ptr);
+	return (new_ptr);
+}
+
+void	*ft_calloc(size_t number, size_t size)
+{
+	void	*ptr;
+
+	ptr = malloc(number * size);
+	if (!ptr)
+	{
+		errno = ENOMEM;
+		return (NULL);
+	}
+	ft_memset(ptr, 0, number * size);
+	return (ptr);
 }
 
 void	*ft_memmove(void *dst, const void *src, size_t len)
@@ -127,12 +176,34 @@ void	free_tokens(t_tokens *tokens)
 	}
 }
 
+int	matrixify(t_tokens *tokens)
+{
+	t_word	*word;
+	size_t	i;
+
+	if (!word)
+		return (0);
+	word = tokens->words;
+	word->word = (t_word **) calloc(word->size + 1, sizeof(t_word *));
+	if (!word->word)
+		return (0);
+	//word = tokens->words;
+	i = 0;
+	while (word)
+	{
+		word->word[i] = word;
+		word = word + 1;
+		i++;
+	}
+	return (1);
+}
+
 /*int main()
 {
 	t_tokens *tokens = init_token(NULL);
 
-	add_words(tokens, "Hello World", 10000, 0);
-	add_words(tokens, "World Hello", 10000, 1);
+	add_words(tokens, "Hello World", 5, 0);
+	add_words(tokens, "World Hello", 5, 1);
 
 	size_t i = 0;
 	while (i < tokens->size)

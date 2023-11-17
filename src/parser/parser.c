@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:25:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/16 21:43:25 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/17 22:00:16 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	break_token(t_tokens *tokens, char *str)
 int	is_normal_ch(char ch)
 {
 	if (special_char(ch) || ch == '#' || ch == '"' \
-			|| ch == ' ' || ch == ''\'')
+			|| ch == ' ' || ch == '\'')
 		return (1);
 	return (0);
 }
@@ -31,7 +31,7 @@ int	string_tokens(t_tokens *tokens, char *str)
 	int	i;
 
 	i = 0;
-	while (str[i] && !is_normal_char(str[i]))
+	while (str[i] && !is_normal_ch(str[i]))
 		i++;
 	add_words(tokens, str, i, 0);
 	return (i);
@@ -61,13 +61,13 @@ int	parse_string(t_tokens *tokens, char *str)
 	return (0);
 }
 
-int	parser(t_tokens *tokens)
+int	parser(t_tokens *tokens, char *str)
 {
 	tokens->error = 0;
-	add_history(tokens->str);
-	if (check_input(tokens->str))
+	add_history(str);
+	if (check_input(str))
 		return (42);
-	parse_string(tokens, tokens, str);
+	parse_string(tokens, str);
 	matrixify(tokens);
 	return (tokens->error);
 }

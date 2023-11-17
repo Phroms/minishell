@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/16 22:02:47 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/17 21:59:32 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_tokens
 {
 	t_word	*words;
 	size_t	size;
+	char	*str;
 	//t_word	*first;
 	t_env	**env;
 	int		error;
@@ -146,6 +147,6 @@ int			break_token(t_tokens *tokens, char *str);
 int			is_normal_ch(char ch);
 int			string_tokens(t_tokens *tokens, char *str);
 int			parse_string(t_tokens *tokens, char *str);
-int			parser(t_tokens *tokens);
+int			parser(t_tokens *tokens, char *str);
 
 #endif

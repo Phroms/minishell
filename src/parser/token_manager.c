@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 21:43:15 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/16 22:02:44 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/17 21:47:50 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,27 +176,70 @@ void	free_tokens(t_tokens *tokens)
 	}
 }
 
-int	matrixify(t_tokens *tokens)
+int matrixify(t_tokens *tokens) 
+{
+    t_word *word;
+    size_t i;
+
+    word = tokens->words;
+    if (!word)
+        return 0;
+
+    tokens->env = (t_env **)ft_calloc(tokens->size + 1, sizeof(t_env *));
+    if (!tokens->env)
+        return 0;
+
+    i = 0;
+    while (i < tokens->size) 
+	{
+        tokens->env[i] = (t_env *)ft_calloc(1, sizeof(t_env));
+        if (!tokens->env[i])
+            return 0;
+
+        tokens->env[i]->env_cpy = (char *)ft_calloc(word[i].len + 1, sizeof(char));
+        if (!tokens->env[i]->env_cpy)
+            return 0;
+
+        // Usar memcpy para copiar la palabra desde la estructura t_word
+        memcpy(tokens->env[i]->env_cpy, word[i].word, word[i].len);
+
+        // Agregar manualmente el carácter nulo al final de la palabra
+        tokens->env[i]->env_cpy[word[i].len] = '\0';
+
+        // Avanzar a la siguiente palabra
+        i++;
+    }
+
+    return 1;
+}
+
+/*int	matrixify(t_tokens *tokens)
 {
 	t_word	*word;
 	size_t	i;
 
+	word = tokens->words;
 	if (!word)
 		return (0);
-	word = tokens->words;
-	word->word = (t_word **) calloc(word->size + 1, sizeof(t_word *));
-	if (!word->word)
+	//word = tokens->words;
+	word->env = (t_env **)ft_calloc(tokens->size + 1, sizeof(t_env *));
+	if (!tokens->env)
 		return (0);
 	//word = tokens->words;
 	i = 0;
-	while (word)
+	while (i < tokens->size)
 	{
-		word->word[i] = word;
-		word = word + 1;
+		tokens->env[i] = (t_env *)ft_calloc(1, sizeof(t_env));
+		if (!tokens->env[i])
+			return (0);
+		ft_memcpy(word->word[i], word[i].word, word->len);
+		word->word[i][word->len] = '\0';
+		//word->word[i] = word;
+		//word = word + 1;
 		i++;
 	}
 	return (1);
-}
+}*/
 
 /*int main()
 {

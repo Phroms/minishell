@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/17 21:59:32 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/18 16:33:51 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ typedef struct s_word
 	size_t	len;
 	int		type;
 }t_word;
+
+typedef struct
+{
+    char **args; // Array de argumentos del comando
+    // Otros campos según sea necesario
+} CommandInfo;
 
 typedef struct s_tokens
 {
@@ -109,6 +115,7 @@ void	signal_ctrl_c(int sig);
  *****************************************************/
 
 int main();
+void	execute_command(CommandInfo *command);
 
 /*****************************************************
  *					  PARSER						 *
@@ -117,7 +124,7 @@ int main();
 	/*--------TOKEN_MANAGER--------*/
 
 t_tokens	*init_token(t_env **env);
-int			add_words(t_tokens *tokens, char *str, size_t len, int type);
+int		add_words(t_tokens *tokens, char *str, size_t len, int type);
 void		free_tokens(t_tokens *tokens);
 int			matrixify(t_tokens *tokens);
 

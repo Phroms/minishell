@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:21:33 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/15 19:51:14 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/22 20:59:06 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,6 @@ void	signal_ctrl_c(int sig)
 void	signals(void)
 {
 	rl_catch_signals = 0;
-	signal(SIGQUIT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN); //esta linea maravillosa hace que le meta un null al readline y al hacer un ctrl-D, le mete ese null dentro del readline y hace un exit(1);
 	signal(SIGINT, signal_ctrl_c);
 }

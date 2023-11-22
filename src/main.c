@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/18 16:33:34 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/22 19:59:18 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int add_words(t_tokens *tokens, char *str, size_t len, int type);
 int special_char(char c);
 void free_tokens(t_tokens *tokens);
 
-/*void execute_command(CommandInfo *command)
+void execute_command(CommandInfo *command)
 {
     pid_t pid = fork(); // Crear un nuevo proceso
 
@@ -123,8 +123,8 @@ int main()
     }
 
     return 0;
-}*/
-int main()
+}
+/*int main()
 {
 	char *input;
 	char *text;
@@ -166,4 +166,4 @@ int main()
 		}
 	}
 	return (0);
-}
+}*/

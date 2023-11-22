@@ -6,13 +6,11 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:19:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/13 19:32:27 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/22 21:01:20 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../../include/minishell.h"
 #include "minishell.h"
-
 
 size_t	read_variable(char *or_env)
 {
@@ -26,7 +24,7 @@ size_t	read_variable(char *or_env)
 
 void	duplicate_env(char **env_cpy, char *or_env)
 {
-	unsigned int i;
+	unsigned int	i;
 
 	i = 0;
 	while (env_cpy[i])
@@ -40,7 +38,7 @@ void	duplicate_env(char **env_cpy, char *or_env)
 
 char	*cpy_or_env(char *or_env)
 {
-	char **env_cpy = NULL;
+	char	**env_cpy = NULL;
 
 	env_cpy = (char **)malloc(sizeof(char *) * read_variable(or_env) + 1);
 	duplicate_env(env_cpy, or_env);
@@ -49,12 +47,13 @@ char	*cpy_or_env(char *or_env)
 
 char	*ft_getenv(char *variable, char **env)
 {
-	int i;
-	   
+	int	i;
+
 	i = 0;
 	while (env[i] != NULL)
 	{
-		if (ft_strncmp(variable, env[i], ft_strlen(variable)) == 0 && env[i][ft_strlen(variable)] == '=')
+		if (ft_strncmp(variable, env[i], ft_strlen(variable)) == 0 \
+				&& env[i][ft_strlen(variable)] == '=')
 		{
 			return env[i] + ft_strlen(variable) + 1;
 		}

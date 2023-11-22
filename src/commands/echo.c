@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 11:42:36 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/15 16:09:42 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/22 20:58:31 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,17 +65,9 @@ int	echo(char **args)
 		args++;
 		if (*args != NULL)
 			printf(" ");
-		/*if (printf("%s", *args) != ft_strlen(*args))
-			return (EXIT_FAILURE);
-		if (ft_strlen(*args) != 0 && *(args + 1) != NULL)
-			if (printf(" ") != ft_strlen(" "))
-				return (EXIT_FAILURE);
-		args++;*/
 	}
 	if (print_line)
 		printf("\n");
-		/*if (printf("\n") != ft_strlen("\n"))
-			return (EXIT_FAILURE);*/
 	return (EXIT_SUCCESS);
 }
 

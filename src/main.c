@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/22 19:59:18 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/23 21:58:50 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void execute_command(CommandInfo *command)
         {
             // Error en la ejecución del comando
             perror("execvp");
+			printf("Error ejecutando el comando: %s\n", command->args[0]);
             exit(EXIT_FAILURE);
         }
     }
@@ -63,6 +64,8 @@ void execute_command(CommandInfo *command)
 
 int main()
 {
+	signals();
+
     char *input;
     t_tokens *tokens;
     t_env **env = NULL;
@@ -71,7 +74,7 @@ int main()
     {
         input = readline(" > ");
         if (!input)
-            exit(0);
+            exit(1);
         if (input)
         {
             printf("Texto ingresado: %s\n", input);

@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/23 21:58:50 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/27 20:36:39 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,11 @@ int main()
                     if (current_word->type == 0)
                     {
                         CommandInfo command;
-                        command.args = malloc(sizeof(char *) * 2); // Tamaño 2 para el comando y NULL al final
-                        command.args[0] = current_word->word;
-                        command.args[1] = NULL; // Termina la lista de argumentos
+                        command.args = malloc(sizeof(char *) * 3);
+						// Tamaño 2 para el comando y NULL al final
+						command.args[0] = "echo";
+                        command.args[1] = current_word->word;
+                        command.args[2] = NULL; // Termina la lista de argumentos
 
                         // Ejecutar el comando
                         execute_command(&command);

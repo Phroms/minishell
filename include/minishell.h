@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/27 20:37:42 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/28 13:19:13 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,13 +73,14 @@ int		main(int argc, char **argv, char **envp);
  *****************************************************/
 
 
+
 	/*--------PWD--------*/
 
 void	pwd(void);
 
 	/*--------ECHO-------*/
 
-int		echo(char **args);
+int		echo(t_env **env);
 
 /*****************************************************
  *					  LEXER							 *
@@ -115,7 +116,7 @@ void	signal_ctrl_c(int sig);
  *****************************************************/
 
 int main();
-void	execute_command(CommandInfo *command);
+void	execute_command(CommandInfo *command, char **env);
 
 /*****************************************************
  *					  PARSER						 *

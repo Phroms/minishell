@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:19:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/22 21:01:20 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/28 14:09:13 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	duplicate_env(char **env_cpy, char *or_env)
 	while (env_cpy[i])
 	{
 		env_cpy[i] = ft_strdup(&or_env[i]);
-		printf("og: %c\n\ncp: %s\n\n", or_env[i], env_cpy[i]);
+		//printf("og: %c\n\ncp: %s\n\n", or_env[i], env_cpy[i]);
 		i++;
 	}
 	env_cpy[i] = NULL;
@@ -40,7 +40,7 @@ char	*cpy_or_env(char *or_env)
 {
 	char	**env_cpy = NULL;
 
-	env_cpy = (char **)malloc(sizeof(char *) * read_variable(or_env) + 1);
+	env_cpy = (char **)malloc(sizeof(char *) * (read_variable(or_env) + 1));
 	duplicate_env(env_cpy, or_env);
 	return (*env_cpy);
 }

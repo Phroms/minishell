@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/30 18:53:56 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/28 13:19:13 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/30 22:14:09 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,7 @@ void	execute_command(CommandInfo *command, char **env);
 
 t_tokens	*init_token(t_env **env);
 int		add_words(t_tokens *tokens, char *str, size_t len, int type);
+t_word	*my_new_word(char *str, size_t len, int type);
 void		free_tokens(t_tokens *tokens);
 int			matrixify(t_tokens *tokens);
 
@@ -155,6 +156,6 @@ int			break_token(t_tokens *tokens, char *str);
 int			is_normal_ch(char ch);
 int			string_tokens(t_tokens *tokens, char *str);
 int			parse_string(t_tokens *tokens, char *str);
-int			parser(t_tokens *tokens, char *str);
+int			parser(t_tokens *tokens);
 
 #endif

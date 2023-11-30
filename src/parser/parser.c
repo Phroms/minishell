@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:25:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/28 13:42:35 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/30 22:09:27 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,11 @@ int	is_normal_ch(char ch)
 int	string_tokens(t_tokens *tokens, char *str)
 {
 	int	i;
-	int	command_found;
 
 	i = 0;
-	command_found = 0;
 	while (str[i] && !is_normal_ch(str[i]))
 		i++;
-	if (!command_found)
-		add_words(tokens, str, i, 0);
+	add_words(tokens, str, i, 0);
 	return (i);
 }
 
@@ -64,13 +61,13 @@ int	parse_string(t_tokens *tokens, char *str)
 	return (0);
 }
 
-int	parser(t_tokens *tokens, char *str)
+int	parser(t_tokens *tokens)
 {
 	tokens->error = 0;
-	add_history(str);
-	if (check_input(str))
+	add_history(tokens->str);
+	if (check_input(tokens->str))
 		return (42);
-	parse_string(tokens, str);
+	parse_string(tokens, tokens->str);
 	matrixify(tokens);
 	return (tokens->error);
 }

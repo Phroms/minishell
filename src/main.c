@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/28 14:09:11 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/30 21:28:36 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,6 +280,8 @@ void free_tokens(t_tokens *tokens);*/
 
     return 0;
 }*/
+
+//este sirveeeee
 void execute_env(char **env) 
 {
     int i = 0;
@@ -292,10 +294,10 @@ void execute_env(char **env)
 
 int main(int argc, char **argv, char **env)
 {
+	signals();
     (void)argc;
     (void)argv;
-	
-	signals();
+
     char *input_buffer = NULL;
     size_t buffer_size = 0;
 
@@ -320,7 +322,7 @@ int main(int argc, char **argv, char **env)
         {
             pwd();
         }
-        else if (strcmp(command, "echo") == 0)
+		else if (strcmp(command, "echo") == 0)
         {
             char *arg = strtok(NULL, " ");
             while (arg != NULL)
@@ -330,11 +332,11 @@ int main(int argc, char **argv, char **env)
             }
             printf("\n");
         }
-        else if (strcmp(command, "env") == 0)
+		else if (strcmp(command, "env") == 0)
         {
             execute_env(env);
         }
-        else
+        else	
         {
             // Comando no reconocido
             printf("Comando no reconocido: %s\n", command);

@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/14 19:16:10 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/23 20:14:28 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/30 22:09:27 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,43 +30,15 @@ int	dst_dots(char *str, char dot)
 		i++;
 	if (str[i] != '\0')
 	{
-		printf("error not closing marks\n");
-		return (-1);
+		if (str[i] != str[0])
+		{
+			printf("error not closing marks\n");
+			return (-1);
+		}
+		return (i);
 	}
-	return (i - 1);
+	return (i);
 }
-
-/*size_t	get_char_special(char *token, char next_special_char)
-{
-	size_t	size;
-
-	size = 0;
-	while (*token)
-	{
-		if (*token == next_special_char)
-		{
-			token++;
-			size++;
-		}
-		else if (*token && *token != next_special_char)
-		{
-			size++;
-			token++;
-		}
-	}
-	return (size);
-}*/
-
-/*char	get_next_char(char *token)
-{
-	while (*token)
-	{
-		if (*token == '|' || *token == '>' || *token == '<')
-			return (*token);
-		token++;
-	}
-	return ('\0');
-}*/
 
 int	is_marks(t_tokens *tokens, char *str)
 {
@@ -80,30 +52,12 @@ int	is_marks(t_tokens *tokens, char *str)
 	}
 	if (len == 0)
 		return (len);
-	if (str[0] == '"')
-		add_words(tokens, str + 1, len, 2);
 	if (str[0] == '\'')
 		add_words(tokens, str + 1, len, 1);
+	if (str[0] == '"')
+		add_words(tokens, str + 1, len, 2);
 	return (len + 2);
 }
-
-/*bool	search_char(char *token)
-{
-	while (*token)
-	{
-		if (ft_strchr(token, '\'') || ft_strchr(token, '\"'))
-			return (false);
-		if (ft_strchr(token, '|') || ft_strchr(token, '>') \
-				|| ft_strchr(token, '<') || ft_strchr(token, ';'))
-		{
-			if (ft_strlen(token) != 1)
-				return (true);
-			return (false);
-		}
-		token++;
-	}
-	return (false);
-}*/
 
 int	is_space(t_tokens *tokens, char *str)
 {

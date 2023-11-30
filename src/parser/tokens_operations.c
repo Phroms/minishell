@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:37:06 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/28 11:18:56 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/30 22:14:14 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	print_tokens(t_tokens *tokens)
 	size_t	i;
 
 	i = 0;
-	while (i < tokens->size)
+	while (tokens->words[i] != NULL)
 	{
 		print_wrd_format("%d: >>%s<<\n", tokens->words[i]);
 		i += 1;

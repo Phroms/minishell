@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:25:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/30 22:09:27 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/02 13:33:42 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	break_token(t_tokens *tokens, char *str)
 {
-	add_words(tokens, str, 1, 3);
+	my_add_word(tokens, str, 1, 3);
 	return (1);
 }
 
@@ -33,7 +33,7 @@ int	string_tokens(t_tokens *tokens, char *str)
 	i = 0;
 	while (str[i] && !is_normal_ch(str[i]))
 		i++;
-	add_words(tokens, str, i, 0);
+	my_add_word(tokens, str, i, 0);
 	return (i);
 }
 

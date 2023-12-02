@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/14 19:16:10 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/30 22:09:27 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/02 13:32:17 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ int	is_marks(t_tokens *tokens, char *str)
 	if (len == 0)
 		return (len);
 	if (str[0] == '\'')
-		add_words(tokens, str + 1, len, 1);
+		my_add_word(tokens, str + 1, len, 1);
 	if (str[0] == '"')
-		add_words(tokens, str + 1, len, 2);
+		my_add_word(tokens, str + 1, len, 2);
 	return (len + 2);
 }
 
@@ -66,6 +66,6 @@ int	is_space(t_tokens *tokens, char *str)
 	i = 0;
 	while (str[i] == ' ')
 		i++;
-	add_words(tokens, " ", 1, 4);
+	my_add_word(tokens, " ", 1, 4);
 	return (i);
 }

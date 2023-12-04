@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 21:43:15 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/02 13:31:18 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/04 20:00:49 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,10 +93,12 @@ void	free_tokens(t_tokens *tokens)
 	{
 		while (i < tokens->size)
 		{
-			free(tokens->words[i].word);
+			if (tokens->words[i].word)
+				free(tokens->words[i].word);
 			i++;
 		}
 		free(tokens->words);
+		free(tokens->str);
 		free(tokens);
 	}
 }

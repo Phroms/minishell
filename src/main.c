@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/02 12:31:26 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/04 21:39:18 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,8 @@ int add_words(t_tokens *tokens, char *str, size_t len, int type);
 int special_char(char c);
 void free_tokens(t_tokens *tokens);*/
 
-/*void execute_command(CommandInfo *command, char **env)
+/* este parece que si */
+void execute_command(CommandInfo *command, char **env)
 {
     pid_t pid = fork();
     if (pid == -1)
@@ -91,9 +92,9 @@ void free_tokens(t_tokens *tokens);*/
         int status;
         waitpid(pid, &status, 0);
     }
-}*/
+}
 
-/*int main(int argc, char **argv, char **env)
+int main(int argc, char **argv, char **env)
 {
     signals();
 	(void)argc;
@@ -149,7 +150,7 @@ void free_tokens(t_tokens *tokens);*/
     }
 
     return 0;
-}*/
+}
 
 /*int main()
 {
@@ -281,8 +282,8 @@ void free_tokens(t_tokens *tokens);*/
     return 0;
 }*/
 
-//este sirveeeee
-void execute_env(char **env) 
+//este parece que no
+/*void execute_env(char **env) 
 {
     int i = 0;
     while (env[i] != NULL) 
@@ -345,4 +346,4 @@ int main(int argc, char **argv, char **env)
 
     free(input_buffer);
     return 0;
-}
+}*/

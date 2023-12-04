@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:25:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/02 13:33:42 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/04 20:49:30 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,34 @@ int	parse_string(t_tokens *tokens, char *str)
 	return (0);
 }
 
-int	parser(t_tokens *tokens)
+int	parser(t_tokens *tokens, char *input)
 {
-	tokens->error = 0;
-	add_history(tokens->str);
-	if (check_input(tokens->str))
-		return (42);
-	parse_string(tokens, tokens->str);
-	matrixify(tokens);
-	return (tokens->error);
+	if (!tokens)
+    {
+        printf("Error: tokens es NULL.\n");
+        return 42;
+    }
+
+    // Asegurarse de que input no sea NULL
+    if (!input)
+    {
+        printf("Error: input es NULL.\n");
+        return 42;
+    }
+
+    // Otras operaciones del parser según sea necesario
+    tokens->error = 0;
+    add_history(input);
+
+    if (check_input(input))
+    {
+        // Manejar error en check_input
+        printf("Error en check_input: algo salió mal.\n");
+        return 42;
+    }
+
+    parse_string(tokens, input);
+    matrixify(tokens);
+
+    return tokens->error;
 }

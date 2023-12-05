@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/04 21:39:18 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/05 21:21:06 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,56 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/*int main(int argc, char **argv, char **env)
-{
-    signals();
-    char *input;
-	(void)argc;
-	(void)argv;
-    while (1)
-    {
-        input = readline(" > ");
-        if (!input)
-            exit(0);
-        if (input)
-        {
-            printf("Texto ingresado: %s\n", input);
-            t_tokens *tokens = init_token(NULL);
-            if (parser(tokens, input) == 42)
-            {
-                printf("Error en la entrada.\n");
-            }
-            else
-            {
-                print_tokens(tokens);
-                size_t i = 0;
-                while (i < tokens->size)
-                {
-                    t_word *current_word = &tokens->words[i];
-                    if (current_word->type == 0)
-                    {
-                        CommandInfo command;
-                        command.args = malloc(sizeof(char *) * 2);
-                        command.args[0] = current_word->word;
-                        command.args[1] = NULL;
-                        execute_command(&command, env);
-                        free(command.args);
-                    }
-                    i += 1;
-                }
-            }
-            free_tokens(tokens);
-            free(input);
-        }
-    }
-    return 0;
-}*/
-
-/*t_tokens *init_token(t_env **env);
-int add_words(t_tokens *tokens, char *str, size_t len, int type);
-int special_char(char c);
-void free_tokens(t_tokens *tokens);*/
 
 /* este parece que si */
 void execute_command(CommandInfo *command, char **env)
@@ -101,186 +51,60 @@ int main(int argc, char **argv, char **env)
 	(void)argv;
     char *input;
 
-    while (1) {
-        input = readline(" > ");
-        if (!input)
-            exit(0);
-
-        if (input) {
-            printf("Texto ingresado: %s\n", input);
-
-            // Inicializar tokens
-            t_tokens *tokens = init_token(NULL);
-
-            // Parsear la entrada
-            if (parser(tokens, input) == 42) {
-                // Manejar el error
-                fprintf(stderr, "Error en la entrada.\n");
-            } else {
-                // Imprimir tokens (opcional)
-                print_tokens(tokens);
-
-                // Ejecutar comandos según los tokens
-                size_t i = 0;
-                while (i < tokens->size) {
-                    t_word *current_word = &tokens->words[i];
-
-                    // Verificar si el token es un comando ejecutable
-                    if (current_word->type == 0) {
-                        CommandInfo command;
-                        command.args = malloc(sizeof(char *) * 2);
-                        command.args[0] = current_word->word;
-                        command.args[1] = NULL; // Termina la lista de argumentos
-
-                        // Ejecutar el comando utilizando la función execute_command
-                        execute_command(&command, env);
-
-                        // Liberar memoria de los argumentos
-                        free(command.args);
-                    }
-
-                    i += 1;
-                }
-            }
-
-            // Liberar memoria de tokens
-            free_tokens(tokens);
-            free(input);
-        }
-    }
-
-    return 0;
-}
-
-/*int main()
-{
-	signals();
-
-	char *input;
-	char *text;
-	char *args[3];
-
-	while (1)
+	t_tokens *tokens = init_token(NULL);
+    while (1)
 	{
-		input = readline(" > ");
+		input = readline("> ");
 		if (!input)
 			exit(0);
 		if (input)
 		{
 			printf("Texto ingresado: %s\n", input);
-			t_tokens *tokens = init_token(NULL);
-			if (add_words(tokens, input, strlen(input), 0))
+			if (parser(tokens, input) == 42)
 			{
-				if (tokens->size > 0)
+				fprintf(stderr, "Error en la entrada.\n");
+            }
+			else
+			{
+				print_tokens(tokens);
+				size_t i = 0;
+				while (i < tokens->size)
 				{
-					printf("Palabra: %s\nTipo: %d\n", tokens->words[0].word, tokens->words[0].type);
-					if (tokens->size == 1 && tokens->words[0].type == 0)
+					t_word *current_word = &tokens->words[i];
+					if (current_word->type == 0)
 					{
-						if (ft_strcmp(tokens->words[0].word, "pwd") == 0)
+            			CommandInfo command;
+						command.args = NULL;
+						command.args = malloc(sizeof(char *) * 2);
+						if (!command.args)
 						{
-							pwd();
+							fprintf(stderr, "Error asignando memoria para command.args\n");
+							free_tokens(tokens);
+							free(input);
+							exit(EXIT_FAILURE);
 						}
-						else if (ft_strncmp(tokens->words[0].word, "echo ", 5) == 0)
+						command.args[0] = strdup(current_word->word);
+						command.args[1] = NULL;
+						if (command.args[0] && access(command.args[0], X_OK) == 0)
 						{
-							text = input + 5;
-							args[0] = "echo";
-							args[1] = text;
-							args[2] = NULL;
-							echo(args);
+							execute_command(&command, env);
+							free(command.args[0]);
+							free(command.args);
 						}
-						else if (ft_strncmp(tokens->words[0].word, "env", 3) == 0)
+						else
 						{
-							env(args);
+							fprintf(stderr, "Comando no valido: %s\n", current_word->word);
 						}
-
 					}
+					i += 1;
 				}
 			}
-			free_tokens(tokens);
-			free(input);
 		}
+		free_tokens(tokens);
+		free(input);
 	}
 	return (0);
-}*/
-
-/*int main() {
-    signals();
-
-    char *input;
-
-    while (1) {
-        input = readline(" > ");
-        if (!input)
-            exit(0);
-
-        if (input) {
-            printf("Texto ingresado: %s\n", input);
-
-            // Inicializar tokens
-            t_tokens *tokens = init_token(NULL);
-
-            // Parsear la entrada
-            if (check_input(input)) {
-                // Error en la entrada
-                printf("Error en la entrada.\n");
-            } else {
-                size_t i = 0;
-                while (i < strlen(input)) {
-                    if (is_space(tokens, input + i)) {
-                        // Manejar espacios
-                        i += is_space(tokens, input + i);
-                    } else if (is_rd(input[i])) {
-                        // Manejar redirecciones
-                        // ...
-                    } else if (is_marks(tokens, input + i)) {
-                        // Manejar comillas
-                        i += is_marks(tokens, input + i);
-                    } else {
-                        i += string_tokens(tokens, input + i);
-                    }
-
-                    if (tokens->error == 1)
-                        break;
-                }
-
-                if (!tokens->error) {
-                    // Ejecutar comandos según los tokens
-                    size_t j = 0;
-                    while (j < tokens->size) {
-                        t_word *current_word = &tokens->words[j];
-
-                        // Verificar si el token es un comando ejecutable
-                        if (current_word->type == 0) {
-                            // Obtener el nombre del comando
-                            char *command_name = current_word->word;
-
-                            // Ejecutar comandos específicos
-                            if (strcmp(command_name, "echo") == 0) {
-                                echo(tokens->env);
-                            } else if (strcmp(command_name, "pwd") == 0) {
-                                pwd();
-                            } else if (strcmp(command_name, "env") == 0) {
-                                // Agregar lógica para el comando env
-                                // ...
-                            } else {
-                                // Otros comandos
-                                printf("Comando desconocido: %s\n", command_name);
-                            }
-                        }
-
-                        j += 1;
-                    }
-                }
-            }
-
-            // Liberar memoria de tokens
-            free_tokens(tokens);
-            free(input);
-        }
-    }
-
-    return 0;
-}*/
+}
 
 //este parece que no
 /*void execute_env(char **env) 
@@ -347,3 +171,58 @@ int main(int argc, char **argv, char **env)
     free(input_buffer);
     return 0;
 }*/
+
+
+/*	IDEASSSSS */
+
+typedef struct s_ShellData
+{
+    t_tokens tokens;
+    t_env **env;
+    t_word *words;
+}t_ShellData;
+
+
+void init_shell_data(ShellData *shell, char **env)
+{
+    // Inicializar la estructura t_tokens
+    shell->tokens.words = NULL;
+    shell->tokens.size = 0;
+    shell->tokens.str = NULL;
+    shell->tokens.env = NULL;
+    shell->tokens.error = 0;
+
+    // Inicializar la estructura t_env
+    // ...
+
+    // Inicializar la estructura t_word
+    // ...
+
+    // Inicializar otras variables según sea necesario
+}
+
+void free_shell_data(ShellData *shell)
+{
+    // Liberar memoria de la estructura t_tokens
+    // ...
+
+    // Liberar memoria de la estructura t_env
+    // ...
+
+    // Liberar memoria de la estructura t_word
+    // ...
+
+    // Liberar otras variables según sea necesario
+}
+
+int main(int argc, char **argv, char **env)
+{
+    ShellData shell;
+    init_shell_data(&shell, env);
+
+    // Operaciones con la nueva estructura ShellData
+    // ...
+
+    free_shell_data(&shell);
+    return 0;
+}

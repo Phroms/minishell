@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:25:59 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/04 20:49:30 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/05 18:13:52 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,26 +39,24 @@ int	string_tokens(t_tokens *tokens, char *str)
 
 int	parse_string(t_tokens *tokens, char *str)
 {
-	int	i;
-	int	j;
+	int i = 0;
+    while (str[i] && str[i] != '#') {
+        if (special_char(str[i])) {
+            i += break_token(tokens, str + i);
+        } else if (str[i] == '"' || str[i] == '\'') {
+            i += is_marks(tokens, str + i);
+        } else if (str[i] == ' ') {
+            i += is_space(tokens, str + i);
+        } else {
+            i += string_tokens(tokens, str + i);
+        }
 
-	i = 0;
-	j = 0;
-	while (str[i] && str[i] != '#')
-	{
-		if (special_char(str[i]))
-			i += break_token(tokens, str + i);
-		else if (str[i] == '"' || str[i] == '\'')
-			i += is_marks(tokens, str + i);
-		else if (str[i] == ' ')
-			i += is_space(tokens, str + i);
-		else
-			i += string_tokens(tokens, str + i);
-		if (tokens->error == 1)
-			return (1);
-		j++;
-	}
-	return (0);
+        if (tokens->error == 1) {
+            return 1;
+        }
+        i++;
+    }
+    return 0;
 }
 
 int	parser(t_tokens *tokens, char *input)

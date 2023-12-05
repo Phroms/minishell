@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/13 21:43:15 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/04 20:00:49 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/05 18:13:09 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,32 +27,25 @@ t_tokens	*init_token(t_env **env)
 
 int my_add_word(t_tokens *tokens, char *str, size_t len, int type)
 {
-    t_word 	*new_word;
-	t_word	*new_array;
-	size_t	i = 0;;
-
-    new_word = my_new_word(str, len, type);
-    if (!new_word)
+	t_word *new_word = my_new_word(str, len, type);
+    if (!new_word) {
         return 0;
-	tokens->size += 1;
-	new_array = malloc(tokens->size * sizeof(t_word));
-	if (!new_array)
-	{
-		free(new_word->word);
-		free(new_word);
-		return (0);
-   	}
-    while(i < tokens->size - 1)
-	{
-		new_array[i] = tokens->words[i];
-		i++;
-	}
-	new_array[tokens->size - 1] = *new_word;
-	free(tokens->words);
-	tokens->words = new_array;
-	free(new_word->word);
-	free(new_word);
-	return (1);
+    }
+
+    tokens->size += 1;
+    t_word *new_array = realloc(tokens->words, tokens->size * sizeof(t_word));
+    if (!new_array) {
+        free(new_word->word);
+        free(new_word);
+        return 0;
+    }
+
+    tokens->words = new_array;
+    tokens->words[tokens->size - 1] = *new_word;
+
+    free(new_word->word);
+    free(new_word);
+    return 1;
 }
 
 t_word *my_new_word(char *str, size_t len, int type)

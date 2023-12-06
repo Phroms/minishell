@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
+/*   By: ojimenez <ojimenez@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 19:21:33 by agrimald          #+#    #+#             */
-/*   Updated: 2023/11/29 16:40:43 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/26 13:56:07 by ojimenez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,34 @@ void	signal_ctrl_c(int sig)
 		rl_redisplay(); // muestra lo escrito por la funcion anterior.
 	}
 }
-
+	/*else if (sig == SIGQUIT) //Ctrl-'\'
+	{
+		
+	}
+	else if (sig == SIGTSTP)//Ctrl-Z
+	{
+		//suspende la ejecucion del programa actual
+	}
+	else if (sig == SIGCHLD)
+	{
+		
+	}
+	else if (sig == SIGTERM)
+	{
+		
+	}
+	else if (sig == SIGKILL)
+	{
+		
+	}
+	else if (sig == SIGHUP)
+	{
+		//se tiene que mirar
+	}
+	
+	
+}
+*/
 void	signals(void)
 {
 	rl_catch_signals = 0;

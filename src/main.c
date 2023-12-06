@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
+/*   By: ojimenez <ojimenez@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 17:46:28 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/05 21:21:06 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/29 18:54:00 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,210 +19,144 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* este parece que si */
-void execute_command(CommandInfo *command, char **env)
+/*void	execute_command(CommandInfo *command, char **env)
 {
-    pid_t pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
-    if (pid == 0)
-    {
-        if (execve(command->args[0], command->args, env) == -1)
-        {
-            perror("execve");
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	if (pid == 0)
+	{
+		if (execve(command->args[0], command->args, env) == -1)
+		{
+			perror("execve");
 			printf("Error ejecutando el comando: %s\n", command->args[0]);
-            exit(EXIT_FAILURE);
-        }
-    }
-    else
-    {
-        int status;
-        waitpid(pid, &status, 0);
-    }
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+	}
 }
 
-int main(int argc, char **argv, char **env)
+int	main(int argc, char *argv[], char *envp[])
 {
-    signals();
-	(void)argc;
-	(void)argv;
-    char *input;
+	char	*input;
 
-	t_tokens *tokens = init_token(NULL);
-    while (1)
+	signals();
+	while (1)
 	{
-		input = readline("> ");
+		input = readline(" > ");
 		if (!input)
 			exit(0);
 		if (input)
 		{
 			printf("Texto ingresado: %s\n", input);
-			if (parser(tokens, input) == 42)
+			// Inicializar tokens
+			t_tokens	*tokens = init_token(NULL);
+			// Parsear la entrada
+			if (check_input(input))
 			{
-				fprintf(stderr, "Error en la entrada.\n");
-            }
-			else
-			{
-				print_tokens(tokens);
+				// Error en la entrada
+				printf("Error en la entrada.\n");
+			} else {
 				size_t i = 0;
-				while (i < tokens->size)
+				while (i < ft_strlen(input))
 				{
-					t_word *current_word = &tokens->words[i];
-					if (current_word->type == 0)
-					{
-            			CommandInfo command;
-						command.args = NULL;
-						command.args = malloc(sizeof(char *) * 2);
-						if (!command.args)
-						{
-							fprintf(stderr, "Error asignando memoria para command.args\n");
-							free_tokens(tokens);
-							free(input);
-							exit(EXIT_FAILURE);
-						}
-						command.args[0] = strdup(current_word->word);
-						command.args[1] = NULL;
-						if (command.args[0] && access(command.args[0], X_OK) == 0)
-						{
-							execute_command(&command, env);
-							free(command.args[0]);
-							free(command.args);
-						}
-						else
-						{
-							fprintf(stderr, "Comando no valido: %s\n", current_word->word);
-						}
+					if (is_space(tokens, input + i)) {
+						// Manejar espacios
+						i += is_space(tokens, input + i);
+					} else if (is_rd(input[i])) {
+						// Manejar redirecciones
+						// ...
+					} else if (is_marks(tokens, input + i)) {
+						// Manejar comillas
+						i += is_marks(tokens, input + i);
+					} else {
+						i += string_tokens(tokens, input + i);
 					}
-					i += 1;
+					if (tokens->error == 1)
+						break ;
+				}
+				if (!tokens->error)
+				{
+					// Ejecutar comandos según los tokens
+					size_t j = 0;
+					while (j < tokens->size)
+					{
+						t_word *current_word = &tokens->words[j];
+
+						// Verificar si el token es un comando ejecutable
+						if (current_word->type == 0) {
+							// Obtener el nombre del comando
+							char *command_name = current_word->word;
+							// Ejecutar comandos específicos
+							if (strcmp(command_name, "echo") == 0)
+								echo(tokens->env);
+							else if (strcmp(command_name, "pwd") == 0)
+								pwd();
+							else if (strcmp(command_name, "env") == 0)
+								// Agregar lógica para el comando env
+								// ...
+							else
+							{
+								// Otros comandos
+								printf("Comando desconocido: %s\n", command_name);
+							}
+						}
+						j += 1;
+					}
 				}
 			}
+			// Liberar memoria de tokens
+			free_tokens(tokens);
+			free(input);
 		}
-		free_tokens(tokens);
-		free(input);
 	}
 	return (0);
-}
-
-//este parece que no
-/*void execute_env(char **env) 
-{
-    int i = 0;
-    while (env[i] != NULL) 
-	{
-        printf("%s\n", env[i]);
-        i++;
-    }
-}
-
-int main(int argc, char **argv, char **env)
-{
-	signals();
-    (void)argc;
-    (void)argv;
-
-    char *input_buffer = NULL;
-    size_t buffer_size = 0;
-
-    while (1)
-    {
-        printf("> ");
-        getline(&input_buffer, &buffer_size, stdin);
-
-        // Eliminamos el carácter de nueva línea del final
-        input_buffer[strcspn(input_buffer, "\n")] = '\0';
-
-        // Parseamos el comando
-        char *command = strtok(input_buffer, " ");
-
-        if (command == NULL)
-        {
-            continue; // Comando vacío, volvemos a pedir entrada
-        }
-
-        // Ejecutamos el comando correspondiente
-        if (strcmp(command, "pwd") == 0)
-        {
-            pwd();
-        }
-		else if (strcmp(command, "echo") == 0)
-        {
-            char *arg = strtok(NULL, " ");
-            while (arg != NULL)
-            {
-                printf("%s ", arg);
-                arg = strtok(NULL, " ");
-            }
-            printf("\n");
-        }
-		else if (strcmp(command, "env") == 0)
-        {
-            execute_env(env);
-        }
-        else	
-        {
-            // Comando no reconocido
-            printf("Comando no reconocido: %s\n", command);
-        }
-    }
-
-    free(input_buffer);
-    return 0;
 }*/
 
-
-/*	IDEASSSSS */
-
-typedef struct s_ShellData
+void	ft_env(char *input, char *env[])
 {
-    t_tokens tokens;
-    t_env **env;
-    t_word *words;
-}t_ShellData;
+	int i;
 
-
-void init_shell_data(ShellData *shell, char **env)
-{
-    // Inicializar la estructura t_tokens
-    shell->tokens.words = NULL;
-    shell->tokens.size = 0;
-    shell->tokens.str = NULL;
-    shell->tokens.env = NULL;
-    shell->tokens.error = 0;
-
-    // Inicializar la estructura t_env
-    // ...
-
-    // Inicializar la estructura t_word
-    // ...
-
-    // Inicializar otras variables según sea necesario
+	i = 0;
+	if (input[0] == 'e' && input[1] == 'n' && input[2] == 'v' && input[3] == '\0')
+	{
+		while (env[i])
+		{
+			printf("%s\n", env[i]);
+			i++;
+		}
+	}
 }
 
-void free_shell_data(ShellData *shell)
+int	main(int argc, char *argv[], char *env[])
 {
-    // Liberar memoria de la estructura t_tokens
-    // ...
+    (void)argc;
+    (void)argv;
+	char		*input;
+	t_tokens	*tokens = NULL;
+	//t_expander	*exp;
+	int			err;
 
-    // Liberar memoria de la estructura t_env
-    // ...
-
-    // Liberar memoria de la estructura t_word
-    // ...
-
-    // Liberar otras variables según sea necesario
-}
-
-int main(int argc, char **argv, char **env)
-{
-    ShellData shell;
-    init_shell_data(&shell, env);
-
-    // Operaciones con la nueva estructura ShellData
-    // ...
-
-    free_shell_data(&shell);
-    return 0;
+	signals();
+	while (1)
+	{
+		input = readline("> ");
+		if (!input)
+			exit(0);
+		ft_env(input, env);
+		err = parser(tokens, input, env);
+		//exp = expander(tokens);
+		//executor();
+	}
+	//free_all();
+    return (0);
 }

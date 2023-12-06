@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 17:37:06 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/05 17:08:09 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/28 11:18:56 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,21 +36,20 @@ int	free_tokens_memory(t_tokens *tokens)
 {
 	size_t	i;
 	//t_word	*word; este no vale
-	//t_word	*aux; 
+	t_word	*aux; 
 
 	i = 0;
 	//word = tokens->words; este tampoco vale
-	while (i < tokens->size)
+	while (tokens->words)
 	{
-		//aux = tokens->words;
-		free(tokens->words[i].word);
-		i++;
+		aux = tokens->words;
+		free(tokens->words);
 		//free(word); este tampoco vale
-		//tokens->words = NULL;
+		tokens->words = NULL;
 		//word = aux; este tampoco vale
 	}
-	//if (tokens->words)
-	free(tokens->words);
+	if (tokens->words)
+		free(tokens->words);
 	//free(word); este tampoco vale
 	return (1);
 }

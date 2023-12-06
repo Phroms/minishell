@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 11:42:36 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/04 18:32:51 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/11/23 21:36:54 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,24 +46,24 @@ int	ft_strncmp(char *s1, char *s2, size_t n)
 	return (0);
 }*/
 
-int	echo(t_env **env)
+int	echo(char **args)
 {
 	bool	print_line;
 
 	print_line = true;
-	if (ft_strncmp((*env)->env_cpy, "echo", ft_strlen((*env)->env_cpy)) != 0)
+	if (ft_strncmp(*args, "echo", ft_strlen(*args)) != 0)
 		return (EXIT_FAILURE);
-	env++;
-	if (*env && ft_strncmp((*env)->env_cpy, "-n", ft_strlen("-n") + 1) == 0)
+	args++;
+	if (*args && ft_strncmp(*args, "-n", ft_strlen("-n") + 1) == 0)
 	{
 		print_line = false;
-		env++;
+		args++;
 	}
-	while (*env != NULL && (*env)->env_cpy !=  NULL)
+	while (*args != NULL)
 	{
-		printf("%s", (*env)->env_cpy);
-		env++;
-		if (*env != NULL && (*env)->env_cpy != NULL)
+		printf("%s", *args);
+		args++;
+		if (*args != NULL)
 			printf(" ");
 	}
 	if (print_line)

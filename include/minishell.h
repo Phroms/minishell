@@ -40,8 +40,16 @@ typedef struct s_word
 	int			type;
 }	t_word;
 
+//  PROCESOS
+typedef struct s_pcs
+{
+	char	**argv; //aqui me guardo solo el texto !(|, >> << > <, " ")
+}	t_pcs;
+
+// STRUCTURA PRINCIPAL
 typedef struct s_tokens
 {
+	// t_prc	*process;
 	t_word	*words;
 	size_t	size;
 	char	*str;
@@ -71,11 +79,9 @@ char		*cpy_or_env(char *or_env);
 char		*ft_getenv(char *variable, char **env);
 int			main(int argc, char **argv, char **envp);
 
-
 /*****************************************************
  *					  COMMANDS						 *
  *****************************************************/
-
 
 	/*--------PWD--------*/
 

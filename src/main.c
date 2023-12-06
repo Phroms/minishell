@@ -154,9 +154,22 @@ int	main(int argc, char *argv[], char *env[])
 			exit(0);
 		ft_env(input, env);
 		err = parser(tokens, input, env);
+		// hacer una o mas funciones que haga los comandos(cmd);
 		//exp = expander(tokens);
 		//executor();
 	}
 	//free_all();
     return (0);
 }
+
+/* funcion que vera si hara comandos */
+/*void	is_command(char *str, char *cmd)
+{
+	if (ft_strcmp(cmd, "pwd"))
+		hacer mi comando pwd;
+	if (ft_strcmp(cmd, "echo"))
+		hacer mi comando echo;
+	if (ft_strcmp(cmd, "cd"))
+		hacer mi comando cd;
+	podemos hacer un ft_strcmp(str, cmd)
+}*/

@@ -134,6 +134,7 @@ void		signal_ctrl_c(int sig);
 
 t_tokens	*init_token(char **env);
 int			add_words(t_tokens *tokens, char *str, size_t len, int type);
+t_word		*create_word(char *str, size_t len, int type);
 void		free_tokens(t_tokens *tokens);
 int			matrixify(t_tokens *tokens);
 
@@ -163,7 +164,7 @@ int			break_token(t_tokens *tokens, char *str);
 int			is_normal_ch(char ch);
 int			string_tokens(t_tokens *tokens, char *str);
 int			parse_string(t_tokens *tokens, char *str);
-int			parser(t_tokens *tokens, char *str, char **env);
+int			parser(t_tokens **tokens, char *str, char **env);
 
 /*****************************************************
  *					  EXPANDER						 *

@@ -14,20 +14,29 @@
 
 void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
 {
-	void	*new_ptr;
-	size_t	copy_size;
-
+    void	*new_ptr;
+    size_t	copy_size;
+	
+	if	(new_size == 0)
+	{
+		free(ptr);
+		return NULL;
+	}
 	new_ptr = malloc(new_size);
 	if (!new_ptr)
 	{
 		free(ptr);
-		return (NULL);
+		return NULL;
 	}
-	if (old_size < new_size)
+	if (ptr != NULL)
+	{
+		if (old_size < new_size)
 		copy_size = old_size;
-	else
+		else
 		copy_size = new_size;
-	ft_memcpy(new_ptr, ptr, copy_size);
-	free(ptr);
-	return (new_ptr);
+		memcpy(new_ptr, ptr, copy_size);
+		free(ptr);
+	}
+	return new_ptr;
 }
+

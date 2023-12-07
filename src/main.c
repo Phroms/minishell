@@ -153,7 +153,13 @@ int	main(int argc, char *argv[], char *env[])
 		if (!input)
 			exit(0);
 		ft_env(input, env);
-		err = parser(tokens, input, env);
+		err = parser(&tokens, input, env);
+		if (tokens != NULL)
+		{
+			// funcion que hara los comandos;
+			// llamamos funcion free_tokens;
+			// igualamos tokens a NULL;
+		}
 		// hacer una o mas funciones que haga los comandos(cmd);
 		//exp = expander(tokens);
 		//executor();
@@ -163,13 +169,13 @@ int	main(int argc, char *argv[], char *env[])
 }
 
 /* funcion que vera si hara comandos */
-/*void	is_command(char *str, char *cmd)
+/*void	is_command(char *input, char *cmd)
 {
-	if (ft_strcmp(cmd, "pwd"))
+	if (input == ft_strcmp(cmd, "pwd"))
 		hacer mi comando pwd;
-	if (ft_strcmp(cmd, "echo"))
+	if (input == ft_strcmp(cmd, "echo"))
 		hacer mi comando echo;
-	if (ft_strcmp(cmd, "cd"))
+	if (input ==ft_strcmp(cmd, "cd"))
 		hacer mi comando cd;
-	podemos hacer un ft_strcmp(str, cmd)
+	podemos hacer un ft_strcmp(str, cm d)
 }*/

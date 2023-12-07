@@ -64,24 +64,24 @@ int	parse_string(t_tokens *tokens, char *str)
 	return (0);
 }
 
-int	parser(t_tokens *tokens, char *str, char **env)
+int	parser(t_tokens **tokens, char *str, char **env)
 {
-	if (!tokens)
+	if (!*tokens)
 	{
-		tokens = init_token(env);
-		if (!tokens)
+		*tokens = init_token(env);
+		if (!*tokens)
 		{
 			printf("Error: oe tu token no funciona\n");
 			return (1);
 		}
 	}
-	tokens->env = env;
-	tokens->error = 0;
+	(*tokens)->env = env;
+	(*tokens)->error = 0;
 	if (check_input(str))
 		return (42);
-	parse_string(tokens, str);
-	matrixify(tokens);
-	if (tokens->error == 0)
+	parse_string(*tokens, str);
+	matrixify(*tokens);
+	if ((*tokens)->error == 0)
 		add_history(str);
-	return (tokens->error);
+	return ((*tokens)->error);
 }

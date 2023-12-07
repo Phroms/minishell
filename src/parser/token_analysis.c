@@ -24,11 +24,16 @@ int	dst_dots(char *str, char dot)
 	int	i;
 
 	i = 1;
+	if (str[1] == '\0')
+	{
+		printf("Error hay null oe\n");
+		return (-1);
+	}
 	if (str[1] == dot)
 		return (-2);
 	while (str[i] && str[i] != dot)
 		i++;
-	if (str[i] != '\0')
+	if (str[i] == '\0')
 	{
 		printf("error not closing marks\n");
 		return (-1);

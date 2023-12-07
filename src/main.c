@@ -124,10 +124,11 @@ int	main(int argc, char *argv[], char *envp[])
 
 void	ft_env(char *input, char *env[])
 {
-	int i;
+	int	i;
 
 	i = 0;
-	if (input[0] == 'e' && input[1] == 'n' && input[2] == 'v' && input[3] == '\0')
+	if (input[0] == 'e' && input[1] == 'n' \
+		&& input[2] == 'v' && input[3] == '\0')
 	{
 		while (env[i])
 		{
@@ -136,15 +137,34 @@ void	ft_env(char *input, char *env[])
 		}
 	}
 }
+/* funcion que vera si hara comandos */
+void	is_command(char *input)
+{
+	if (ft_strcmp(input, "pwd") == 0)
+	{
+		pwd();
+		printf("Comando ejecutado 😎\n");
+	}
+	/*else if (ft_strcmp(input, "echo ") == 0)
+	{
+		echo();
+		printf("Comando ejecutado 🤓\n");
+	}*/
+	/*if (ft_strcmp(input, "echo") == 0)
+		
+	if (ft_strcmp(input, "cd") == 0)
+		hacer mi comando cd;
+	podemos hacer un ft_strcmp(str, cm d)*/
+}
 
 int	main(int argc, char *argv[], char *env[])
 {
-    (void)argc;
-    (void)argv;
-	char		*input;
+	(void)argc;
+	(void)argv;
 	t_tokens	*tokens = NULL;
-	//t_expander	*exp;
+	char		*input;
 	int			err;
+	//t_expander	*exp;
 
 	signals();
 	while (1)
@@ -156,8 +176,8 @@ int	main(int argc, char *argv[], char *env[])
 		err = parser(&tokens, input, env);
 		if (tokens != NULL)
 		{
-			// funcion que hara los comandos;
-			// llamamos funcion free_tokens;
+			is_command(input);
+			//free_tokens(tokens); este free_tokens no porque ya liberamos en el parser;
 			// igualamos tokens a NULL;
 		}
 		// hacer una o mas funciones que haga los comandos(cmd);
@@ -165,17 +185,6 @@ int	main(int argc, char *argv[], char *env[])
 		//executor();
 	}
 	//free_all();
-    return (0);
+	return (0);
 }
 
-/* funcion que vera si hara comandos */
-/*void	is_command(char *input, char *cmd)
-{
-	if (input == ft_strcmp(cmd, "pwd"))
-		hacer mi comando pwd;
-	if (input == ft_strcmp(cmd, "echo"))
-		hacer mi comando echo;
-	if (input ==ft_strcmp(cmd, "cd"))
-		hacer mi comando cd;
-	podemos hacer un ft_strcmp(str, cm d)
-}*/

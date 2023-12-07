@@ -10,41 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../../include/minishell.h"
 #include "minishell.h"
-
-/*#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>*/
-
-/*int	ft_strlen(const char *s)
-{
-	size_t	i;
-
-	if (!s)
-		return (0);
-	i = 0;
-	while (*s++)
-		i++;
-	return (i);
-}
-
-int	ft_strncmp(char *s1, char *s2, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < n && (*s1 != '\0' || *s2 != '\0'))
-	{
-		if (*s1 != *s2)
-			return ((unsigned char)*s1 - (unsigned char)*s2);
-		s1++;
-		s2++;
-		i++;
-	}
-	return (0);
-}*/
 
 int	echo(char **args)
 {

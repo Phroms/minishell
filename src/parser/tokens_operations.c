@@ -35,21 +35,17 @@ void	print_tokens(t_tokens *tokens)
 int	free_tokens_memory(t_tokens *tokens)
 {
 	size_t	i;
-	//t_word	*word; este no vale
-	t_word	*aux; 
+	t_word	*word;
+	//t_word	*aux; 
 
 	i = 0;
-	//word = tokens->words; este tampoco vale
 	while (tokens->words)
 	{
-		aux = tokens->words;
-		free(tokens->words);
-		//free(word); este tampoco vale
-		tokens->words = NULL;
-		//word = aux; este tampoco vale
+		word = &tokens->words[i];
+		free(word->word);
+		i++;
 	}
-	if (tokens->words)
-		free(tokens->words);
-	//free(word); este tampoco vale
+	free(tokens->words);
+	free(tokens);
 	return (1);
 }

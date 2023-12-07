@@ -115,6 +115,7 @@ void	free_tokens(t_tokens *tokens)
 			i++;
 		}
 		free(tokens->words);
+		tokens->words = NULL;
 		free(tokens);
 	}
 }

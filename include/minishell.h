@@ -40,9 +40,17 @@ typedef struct s_word
 	int			type;
 }	t_word;
 
-//  PROCESOS
+//  PROCESOS Y DEFINICION DE LOS TIPOS DE COSAS QUE LE ENVIO
+
+#define ARGUMENTS 0		// Palabra o argumentos normal
+#define PIPE 1			// Operador o tuberia (|)
+#define REDIRECT_IN 2 	// Operador de redireccion de entrad (<)
+#define REDIRECT_OUT 3	// Operador de redireccion de salida (>)
+#define APPEND 4		// Operador de redireccion de salida en concatenacion (>>)
+
 typedef struct s_pcs
 {
+	int		*types; // Array de tipos correspondientes a cada elemento del argv
 	char	**argv; //aqui me guardo solo el texto !(|, >> << > <, " ")
 }	t_pcs;
 
@@ -170,7 +178,7 @@ int			parser(t_tokens **tokens, char *str, char **env);
  *					  EXPANDER						 *
  *****************************************************/
 
-# define NONE 0
+/*# define NONE 0
 # define INP 1
 # define OUTP 2
 # define PIPE 3
@@ -179,7 +187,7 @@ int			parser(t_tokens **tokens, char *str, char **env);
 # define INPIPE 6
 # define OUTPIPE 7
 # define HEREDOC_PIPE 8
-# define APPEND_PIPE 9
+# define APPEND_PIPE 9*/
 
 
 //expander.c

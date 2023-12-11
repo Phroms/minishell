@@ -122,7 +122,7 @@ int	main(int argc, char *argv[], char *envp[])
 	return (0);
 }*/
 
-/*void	ft_env(char *input, char *env[])
+void	ft_env(char *input, char *env[])
 {
 	int	i;
 
@@ -138,8 +138,8 @@ int	main(int argc, char *argv[], char *envp[])
 	}
 }
 //funcion que vera si hara comandos
-*/
-/*void	is_command(char *input)
+
+void	is_command(char *input)
 {
 	if (ft_strcmp(input, "pwd") == 0)
 	{
@@ -151,12 +151,12 @@ int	main(int argc, char *argv[], char *envp[])
 		echo(&input);
 		printf("Comando ejecutado 🤓\n");
 	}
-	if (ft_strcmp(input, "echo") == 0)
-		
-	if (ft_strcmp(input, "cd") == 0)
+	//if (ft_strcmp(input, "echo") == 0)
+}		
+	/* if (ft_strcmp(input, "cd") == 0)
 		hacer mi comando cd;
-	podemos hacer un ft_strcmp(str, cm d)
-}
+	podemos hacer un ft_strcmp(str, cm d) */
+
 
 // NO ELIMINAR ESTE MAIN ꜜ
 int	main(int argc, char **argv, char **env)
@@ -188,8 +188,4 @@ int	main(int argc, char **argv, char **env)
 	}
 	//free_all();
 	return (0);
-}*/
-
-
-HACER UN MAIN SOLO PARA EL PARSER PARA VER SI LO HACE CORRECTAMENTE
-NO LO OLVIDES PERROOOOO 😎
+}

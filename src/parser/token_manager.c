@@ -39,11 +39,14 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
         return 0;
     }
     if (tokens->size > 1)
+	{
         memcpy(new_array, tokens->words, (tokens->size - 1) * sizeof(t_word));
+		free(tokens->words);
+	}
 	new_array[tokens->size - 1] = *new_word;
-	free(tokens->words);
+	//free(tokens->words);
 	tokens->words = new_array;
-	free(new_word->word);
+	//free(new_word->word);
 	free(new_word);
 	return (1);
 }
@@ -51,9 +54,9 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 t_word *create_word(char *str, size_t len, int type)
 {
     t_word *word = malloc(sizeof(t_word));
-	size_t i;
+	//size_t i;
 
-	i = 0;
+	//i = 0;
     if (!word)
         return NULL;
 
@@ -67,12 +70,12 @@ t_word *create_word(char *str, size_t len, int type)
     word->len = len;
     word->type = type;
     //word->next = NULL;
-    word->word[len] = '\0';
+    //word->word[len] = '\0';
 
     while (len-- > 0)
 	{
         word->word[len] = str[len];
-		i++;
+		//i++;
 	}
     return word;
 }
@@ -85,14 +88,14 @@ int	matrixify(t_tokens *tokens)
 	if (!word)
 		return 0;
 
-	tokens->env = (char **)ft_calloc(tokens->size + 1, sizeof(char *));
+	tokens->env = (char **)calloc(tokens->size + 1, sizeof(char *));
 	if (!tokens->env)
 		return 0;
 
 	i = 0;
 	while (i < tokens->size) 
 	{
-		tokens->env[i] = ft_strdup(word[i].word);
+		tokens->env[i] = strdup(word[i].word);
 		if (!tokens->env[i])
 			return 0;
 		/*memcpy(tokens->env[i]->env_cpy, word[i].word, word[i].len);
@@ -104,7 +107,12 @@ int	matrixify(t_tokens *tokens)
 
 void	free_tokens(t_tokens *tokens)
 {
-	size_t	i;
+	if (tokens)
+	{
+		free(tokens->words);
+		free(tokens);
+	}
+	/* size_t	i;
 
 	i = 0;
 	if (tokens)
@@ -117,7 +125,7 @@ void	free_tokens(t_tokens *tokens)
 		free(tokens->words);
 		tokens->words = NULL;
 		free(tokens);
-	}
+	} */
 }
 
 /*int main()

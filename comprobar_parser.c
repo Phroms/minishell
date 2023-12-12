@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/11 19:01:31 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/12 18:45:30 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,6 @@
 # include <stdbool.h>
 
 // Estructuras
-typedef struct s_env
-{
-	char	*env_cpy;
-}	t_env;
 
 typedef struct s_word
 {
@@ -32,12 +28,6 @@ typedef struct s_word
 	size_t		len;
 	int			type;
 }	t_word;
-
-typedef struct s_pcs
-{
-	int		*types;
-	char	**argv;
-}	t_pcs;
 
 typedef struct s_tokens
 {
@@ -47,6 +37,21 @@ typedef struct s_tokens
 	char	**env;
 	int		error;
 }	t_tokens;
+
+typedef struct s_env
+{
+	char	*env_cpy;
+}	t_env;
+
+
+
+typedef struct s_pcs
+{
+	int			*types;
+	t_tokens	*argv;
+}	t_pcs;
+
+
 
 // Funciones
 int special_char(char c);
@@ -66,6 +71,16 @@ t_word *create_word(char *str, size_t len, int type);
 #define REDIRECT_IN 2 	// Operador de redireccion de entrad (<)
 #define REDIRECT_OUT 3	// Operador de redireccion de salida (>)
 #define APPEND 4		// Operador de redireccion de salida en concatenacion (>>)
+
+int operator_types[256] = {0};
+
+void initialize_operator_types()
+{
+    operator_types['|'] = PIPE;
+    operator_types['>'] = REDIRECT_OUT;
+    operator_types['<'] = REDIRECT_IN;
+    operator_types['2'] = APPEND;  // '2' representa ">>"
+}
 
 int	is_rd(int c)
 {
@@ -105,13 +120,21 @@ int	check_input(char *str)
 	i = 0;
 	while (str[i] != '\0')
 	{
-		if (str[i] == '>' || str[i] == '<' || str[i] == '|')
+		if (str[i] == '>' || str[i] == '<') //|| str[i] == '|')
 		{
 			if (str[i + 1] == '>' || str[i + 1] == '<')
+			{
 				printf("syntax error near unexpected token '%c'\n", str[i]);
+				return 1;
+			}
+		}
+		else if (str[i] == '|')
+		{
 			if (str[i + 1] == '|')
+			{
 				printf("syntax error near unexpected token '|'\n");
-			return (1);
+				return (1);
+			}
 		}
 		i++;
 	}
@@ -164,7 +187,7 @@ int	parse_string(t_tokens *tokens, char *str)
 		else
 			i += string_tokens(tokens, str + i);
 		if (tokens->error == 1)
-			return (1);
+			return (1);	
 		j++;
 	}
 	return (0);
@@ -266,7 +289,7 @@ t_tokens	*init_token(char **env)
 
 int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 {
-    t_word *new_word = create_word(str, len, type);
+    /*t_word *new_word = create_word(str, len, type);
     if (!new_word)
 		return 0;
 	tokens->size += 1;
@@ -287,7 +310,47 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 	tokens->words = new_array;
 	//free(new_word->word);
 	free(new_word);
-	return (1);
+	return (1);*/
+    if (type == ARGUMENTS)
+    {
+        // Ajusta la lógica para reconocer correctamente ">>" como APPEND
+        if (len >= 2 && str[0] == '>' && str[1] == '>')
+        {
+            type = APPEND;
+        }
+        else
+        {
+            type = operator_types[str[0]];
+        }
+    }
+
+    t_word *new_word = create_word(str, len, type);
+    if (!new_word)
+        return 0;
+
+    size_t new_size = tokens->size + 1;
+
+    t_word *new_array = malloc(new_size * sizeof(t_word));
+    if (!new_array)
+    {
+        free(new_word->word);
+        free(new_word);
+        return 0;
+    }
+
+    if (tokens->words)
+    {
+        memcpy(new_array, tokens->words, tokens->size * sizeof(t_word));
+        free(tokens->words);
+    }
+
+    new_array[tokens->size] = *new_word;
+    tokens->words = new_array;
+    tokens->size = new_size;
+
+    free(new_word);
+
+    return 1;
 }
 
 t_word *create_word(char *str, size_t len, int type)
@@ -391,8 +454,53 @@ int	free_tokens_memory(t_tokens *tokens)
 	return (1);
 }
 
-int main() {
+void	print_pcs_recur(t_pcs *pcs, size_t index)
+{
+	if (!pcs || !pcs->argv || index >= pcs->argv->size)	
+		return ;
+
+	if (pcs->types)
+		printf("Tipo: %d - Arguments: %s\n", pcs->types[index], pcs->argv->words[index].word);
+	else
+		printf("Tipo: -1 - Arguments: %s\n", pcs->argv->words[index].word);
+
+	print_pcs_recur(pcs, index + 1);	
+}
+
+void	print_pcs(t_pcs *pcs)
+{
+	if (!pcs || !pcs->argv || pcs->argv->size == 0 || !pcs->argv->words)
+	{
+		printf("Oe payaso no hay nada 🤡\n");
+		return ;
+	}
+	printf("Procesos:\n");
+	print_pcs_recur(pcs, 0);
+}
+
+void	print_pcs_types(t_tokens *tokens, int operator_types[])
+{
+	if (!tokens || !tokens->words)
+	{
+		printf("No hay tipos asociados a pcs. gil:\n");
+		return ;
+	}
+	printf ("Aqui si hay tipos asociados a pcs wapo:\n");
+	size_t i = 0;
+	while (i < tokens->size)
+	{
+		printf("%d ", operator_types[tokens->words[i].word[0]]);
+		i++;
+	}
+	printf("\n");
+}
+
+int main()
+{
     char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
+
+    // Inicializar el array de tipos de operadores
+    initialize_operator_types();
 
     t_tokens *tokens = NULL;
     char input[256]; // Puedes ajustar el tamaño según tus necesidades
@@ -403,10 +511,19 @@ int main() {
 
     int result = parser(&tokens, input, env);
 
-    if (result == 0) {
+    if (result == 0)
+    {
         printf("Tokens generados:\n");
         print_tokens(tokens);
-    } else {
+        t_pcs procesos;
+        procesos.argv = tokens;
+        procesos.types = NULL;
+        if (tokens && tokens->size > 0 && tokens->error == 0)
+            procesos.types = &tokens->words[0].type;
+        print_pcs_types(procesos.argv, operator_types);
+    }
+    else
+    {
         printf("Error durante el análisis de la cadena.\n");
     }
 
@@ -416,3 +533,49 @@ int main() {
     return 0;
 }
 
+/*int main()
+{
+    char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
+
+    // Inicializar el array de tipos de operadores
+    initialize_operator_types();
+
+    t_tokens *tokens = NULL;
+    char input[256]; // Puedes ajustar el tamaño según tus necesidades
+
+    printf("Ingresa una cadena: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n\r")] = '\0'; // Elimina salto de línea y retorno de carro
+
+    int result = parser(&tokens, input, env);
+
+    if (result == 0)
+    {
+        printf("Tokens generados:\n");
+        print_tokens(tokens);
+
+        // Imprimir tipos de tokens
+        printf("Tipos de tokens generados:\n");
+        for (size_t i = 0; i < tokens->size; ++i)
+        {
+            printf("%d ", tokens->words[i].type);
+        }
+        printf("\n");
+
+        t_pcs procesos;
+        procesos.argv = tokens;
+        procesos.types = NULL;
+        if (tokens && tokens->size > 0 && tokens->error == 0)
+            procesos.types = &tokens->words[0].type;
+        print_pcs_types(procesos.argv, operator_types);
+    }
+    else
+    {
+        printf("Error durante el análisis de la cadena.\n");
+    }
+
+    // Liberar memoria si es necesario
+    free_tokens(tokens);
+
+    return 0;
+}*/

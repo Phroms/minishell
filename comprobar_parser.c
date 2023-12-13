@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/12 18:45:30 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/13 21:33:29 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@
 # include <limits.h>
 # include <unistd.h>
 # include <stdbool.h>
-
+# include <readline/readline.h>
+# include <readline/history.h>
 // Estructuras
 
 typedef struct s_word
@@ -61,7 +62,7 @@ int is_marks(t_tokens *tokens, char *str);
 int is_space(t_tokens *tokens, char *str);
 t_tokens *init_token(char **env);
 int matrixify(t_tokens *tokens);
-void add_history(char *str);
+int	add_history(const char *str);
 t_word *create_word(char *str, size_t len, int type);
 
 //  PROCESOS Y DEFINICION DE LOS TIPOS DE COSAS QUE LE ENVIO
@@ -71,6 +72,7 @@ t_word *create_word(char *str, size_t len, int type);
 #define REDIRECT_IN 2 	// Operador de redireccion de entrad (<)
 #define REDIRECT_OUT 3	// Operador de redireccion de salida (>)
 #define APPEND 4		// Operador de redireccion de salida en concatenacion (>>)
+#define DOUBLE_INT 5	// Operador de redireccion de entrada doble (<<)
 
 int operator_types[256] = {0};
 
@@ -80,6 +82,7 @@ void initialize_operator_types()
     operator_types['>'] = REDIRECT_OUT;
     operator_types['<'] = REDIRECT_IN;
     operator_types['2'] = APPEND;  // '2' representa ">>"
+	operator_types['3'] = DOUBLE_INT;
 }
 
 int	is_rd(int c)
@@ -120,7 +123,7 @@ int	check_input(char *str)
 	i = 0;
 	while (str[i] != '\0')
 	{
-		if (str[i] == '>' || str[i] == '<') //|| str[i] == '|')
+		if (str[i] == '>' || str[i] == '<' || str[i] == '|')
 		{
 			if (str[i + 1] == '>' || str[i + 1] == '<')
 			{
@@ -320,7 +323,7 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
         }
         else
         {
-            type = operator_types[str[0]];
+            type = operator_types[(int)str[0]];
         }
     }
 
@@ -489,12 +492,111 @@ void	print_pcs_types(t_tokens *tokens, int operator_types[])
 	size_t i = 0;
 	while (i < tokens->size)
 	{
-		printf("%d ", operator_types[tokens->words[i].word[0]]);
+		printf("%d ", operator_types[(unsigned char)tokens->words[i].word[0]]);
 		i++;
 	}
 	printf("\n");
 }
 
+/*void	signal_ctrl_c(int sig)
+{
+	if (sig == SIGINT) //esto le indica que interrumpe el programa;
+	{
+		printf("\n");
+		rl_on_new_line(); // esto indica que el cursor debe moverse a una nueva linea;
+		rl_replace_line("", 0); // reemplaza el antiguo texto con uno nuevo
+		rl_redisplay(); // muestra lo escrito por la funcion anterior.
+	}
+}
+
+void	signals(void)
+{
+	rl_catch_signals = 0;
+	signal(SIGQUIT, SIG_IGN); //esta linea maravillosa hace que le meta un null al readline y al hacer un ctrl-D, le mete ese null dentro del readline y hace un exit(1);
+	signal(SIGINT, signal_ctrl_c);
+}*/
+
+void	pwd(void)
+{
+	char	*pwd;
+
+	pwd = getcwd(NULL, 0);
+	if (pwd != NULL)
+	{
+		printf("%s\n", pwd);
+		free(pwd);
+	}
+}
+
+void	ft_env(char *input, char *env[])
+{
+	int	i;
+
+	i = 0;
+	if (input[0] == 'e' && input[1] == 'n' \
+		&& input[2] == 'v' && input[3] == '\0')
+	{
+		while (env[i])
+		{
+			printf("%s\n", env[i]);
+			i++;
+		}
+	}
+}
+//funcion que vera si hara comandos
+
+void	is_command(char *input)
+{
+	if (strcmp(input, "pwd") == 0)
+	{
+		pwd();
+		printf("Comando ejecutado perrooooooo😎\n");
+	}
+	/*if (strcmp(input, "echo ") == 0)
+	{
+		echo(&input);
+		printf("Comando ejecutado 🤓\n");
+	}*/
+	//if (ft_strcmp(input, "echo") == 0)
+}
+	/* if (ft_strcmp(input, "cd") == 0)
+		hacer mi comando cd;
+	podemos hacer un ft_strcmp(str, cm d) */
+
+
+// NO ELIMINAR ESTE MAIN ꜜ
+/*int	main(int argc, char **argv, char **env)
+{
+	(void)argc;
+	(void)argv;
+	t_tokens	*tokens = NULL;
+	char		*input;
+	int			err;
+	//t_expander	*exp;
+	
+	initialize_operator_types();
+	//signals();
+	while (1)
+	{
+		input = readline("> ");
+		if (!input)
+			exit(0);
+		ft_env(input, env);
+		err = parser(&tokens, input, env);
+		if (tokens != NULL)
+		{
+			is_command(input);
+			//free_tokens(tokens); este free_tokens no porque ya liberamos en el parser;
+			// igualamos tokens a NULL;
+		}
+		// hacer una o mas funciones que haga los comandos(cmd);
+		//exp = expander(tokens);
+		//executor();
+	}
+	//free_all();
+	return (0);
+}*/
+/* main que sirve no eliminar*/
 int main()
 {
     char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
@@ -532,50 +634,3 @@ int main()
 
     return 0;
 }
-
-/*int main()
-{
-    char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
-
-    // Inicializar el array de tipos de operadores
-    initialize_operator_types();
-
-    t_tokens *tokens = NULL;
-    char input[256]; // Puedes ajustar el tamaño según tus necesidades
-
-    printf("Ingresa una cadena: ");
-    fgets(input, sizeof(input), stdin);
-    input[strcspn(input, "\n\r")] = '\0'; // Elimina salto de línea y retorno de carro
-
-    int result = parser(&tokens, input, env);
-
-    if (result == 0)
-    {
-        printf("Tokens generados:\n");
-        print_tokens(tokens);
-
-        // Imprimir tipos de tokens
-        printf("Tipos de tokens generados:\n");
-        for (size_t i = 0; i < tokens->size; ++i)
-        {
-            printf("%d ", tokens->words[i].type);
-        }
-        printf("\n");
-
-        t_pcs procesos;
-        procesos.argv = tokens;
-        procesos.types = NULL;
-        if (tokens && tokens->size > 0 && tokens->error == 0)
-            procesos.types = &tokens->words[0].type;
-        print_pcs_types(procesos.argv, operator_types);
-    }
-    else
-    {
-        printf("Error durante el análisis de la cadena.\n");
-    }
-
-    // Liberar memoria si es necesario
-    free_tokens(tokens);
-
-    return 0;
-}*/

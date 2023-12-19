@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/13 21:33:29 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/19 16:11:40 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -528,13 +528,38 @@ void	pwd(void)
 	}
 }
 
+int	echo(char **args)
+{
+	bool	print_line;
+
+	print_line = true;
+	if (strncmp(*args, "echo", strlen(*args)) != 0)
+		return (EXIT_FAILURE);
+	args++;
+	if (*args && strncmp(*args, "-n", strlen("-n") + 1) == 0)
+	{
+		print_line = false;
+		args++;
+	}
+	while (*args != NULL)
+	{
+		printf("%s", *args);
+		args++;
+		if (*args != NULL)
+			printf(" ");
+	}
+	if (print_line)
+		printf("\n");
+	return (EXIT_SUCCESS);
+}
+
 void	ft_env(char *input, char *env[])
 {
 	int	i;
 
 	i = 0;
 	if (input[0] == 'e' && input[1] == 'n' \
-		&& input[2] == 'v' && input[3] == '\0')
+		&& input[2] == 'v' && input[3] == '\0')		// !ft_strcmp(input, "env")
 	{
 		while (env[i])
 		{
@@ -542,6 +567,97 @@ void	ft_env(char *input, char *env[])
 			i++;
 		}
 	}
+}
+
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	size_t	s_len;
+	char	*s_str;
+	size_t	i;
+
+	if (!s)
+		return (NULL);
+	s_len = strlen(s);
+	if (start >= s_len)
+		return (NULL);
+	if (start + len > s_len)
+		len = s_len - start;
+	s_str = (char *)malloc((len + 1) * sizeof(char));
+	if (!s_str)
+		return (NULL);
+	while (*s && start--)
+		s++;
+	i = 0;
+	while (*s && i < len)
+	{
+		s_str[i] = *s;
+		i++;
+		s++;
+	}
+	s_str[i] = '\0';
+	return (s_str);
+}
+
+static char	**ft_freeall(char **tab, size_t i)
+{
+	while (i-- > 0)
+		free(tab[i]);
+	free(tab);
+	return (NULL);
+}
+
+static size_t	ft_splitlen(const char *s, char c)
+{
+	size_t	i;
+
+	i = 0;
+	while (*s)
+	{
+		while (*s == c)
+			s++;
+		if (*s)
+			i++;
+		while (*s && *s != c)
+			s++;
+	}
+	return (i);
+}
+
+static char	**ft_split_aux(char **arr, char const *s, char c)
+{
+	if (!s)
+		return (NULL);
+	arr = calloc((ft_splitlen(s, c) + 1), sizeof(char *));
+	if (!arr)
+		return (NULL);
+	return (arr);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char	**arr;
+	char	*start;
+	size_t	i;
+
+	arr = NULL;
+	arr = ft_split_aux(arr, s, c);
+	i = 0;
+	while (*s)
+	{
+		while (*s == c)
+			s++;
+		if (*s)
+		{
+			start = (char *)s;
+			while (*s && *s != c)
+				s++;
+			arr[i++] = ft_substr(start, 0, s - start);
+			if (!arr[i - 1])
+				return (ft_freeall(arr, i - 1));
+		}
+	}
+	arr[i] = NULL;
+	return (arr);
 }
 //funcion que vera si hara comandos
 
@@ -552,12 +668,16 @@ void	is_command(char *input)
 		pwd();
 		printf("Comando ejecutado perrooooooo😎\n");
 	}
-	/*if (strcmp(input, "echo ") == 0)
+	char **args;
+	args = ft_split(input, ' ');
+	if (args[0] != NULL)
 	{
-		echo(&input);
-		printf("Comando ejecutado 🤓\n");
-	}*/
-	//if (ft_strcmp(input, "echo") == 0)
+		if (strcmp(args[0], "echo") == 0)
+		{
+			echo(args);
+			printf("Comando ejecutado 🤓\n");
+		}	//if (ft_strcmp(input, "echo") == 0)
+	}
 }
 	/* if (ft_strcmp(input, "cd") == 0)
 		hacer mi comando cd;
@@ -565,7 +685,7 @@ void	is_command(char *input)
 
 
 // NO ELIMINAR ESTE MAIN ꜜ
-/*int	main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **env)
 {
 	(void)argc;
 	(void)argv;
@@ -595,9 +715,9 @@ void	is_command(char *input)
 	}
 	//free_all();
 	return (0);
-}*/
+}
 /* main que sirve no eliminar*/
-int main()
+/*int main()
 {
     char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
 
@@ -633,4 +753,4 @@ int main()
     free_tokens(tokens);
 
     return 0;
-}
+}*/

@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/19 16:11:40 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/20 20:13:03 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,9 +260,9 @@ int	is_marks(t_tokens *tokens, char *str)
 	if (len == 0)
 		return (len);
 	if (str[0] == '"')
-		add_words(tokens, str + 1, len, 2);
-	if (str[0] == '\'')
-		add_words(tokens, str + 1, len, 1);
+		add_words(tokens, str + 1, len - 2, 2);
+	else if (str[0] == '\'')
+		add_words(tokens, str + 1, len - 2, 1);
 	return (len + 2);
 }
 
@@ -316,24 +316,39 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 	return (1);*/
     if (type == ARGUMENTS)
     {
-        // Ajusta la lógica para reconocer correctamente ">>" como APPEND
+        // Ajustar la lógica para reconocer correctamente ">>" como APPEND
         if (len >= 2 && str[0] == '>' && str[1] == '>')
         {
             type = APPEND;
+            len = 2; // Ajustar la longitud para ">>"
         }
         else
         {
-            type = operator_types[(int)str[0]];
+            type = operator_types[(unsigned char)str[0]];
         }
     }
 
-    t_word *new_word = create_word(str, len, type);
+    // Copiar la cadena y eliminar comillas si existen alrededor
+    char *word_copy = strndup(str, len);
+    if (!word_copy)
+        return 0;
+
+    if ((word_copy[0] == '"' && word_copy[len - 1] == '"') || (word_copy[0] == '\'' && word_copy[len - 1] == '\''))
+    {
+        free(word_copy);
+        word_copy = strndup(str + 1, len - 2);
+        if (!word_copy)
+            return 0;
+    }
+
+    t_word *new_word = create_word(word_copy, strlen(word_copy), type);
+    free(word_copy); // Liberar la copia después de usarla
     if (!new_word)
         return 0;
 
     size_t new_size = tokens->size + 1;
 
-    t_word *new_array = malloc(new_size * sizeof(t_word));
+    t_word *new_array = realloc(tokens->words, new_size * sizeof(t_word));
     if (!new_array)
     {
         free(new_word->word);
@@ -341,14 +356,8 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
         return 0;
     }
 
-    if (tokens->words)
-    {
-        memcpy(new_array, tokens->words, tokens->size * sizeof(t_word));
-        free(tokens->words);
-    }
-
-    new_array[tokens->size] = *new_word;
     tokens->words = new_array;
+    tokens->words[tokens->size] = *new_word;
     tokens->size = new_size;
 
     free(new_word);
@@ -358,11 +367,9 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 
 t_word *create_word(char *str, size_t len, int type)
 {
-    t_word *word = malloc(sizeof(t_word));
-	//size_t i;
-
-	//i = 0;
-    if (!word)
+    /*t_word *word = malloc(sizeof(t_word));
+    
+	if (!word)
         return NULL;
 
     word->word = calloc(len + 1, sizeof(char));
@@ -374,14 +381,22 @@ t_word *create_word(char *str, size_t len, int type)
 
     word->len = len;
     word->type = type;
-    //word->next = NULL;
-    //word->word[len] = '\0';
-
     while (len-- > 0)
 	{
         word->word[len] = str[len];
-		//i++;
 	}
+    return word;*/
+   t_word *word = malloc(sizeof(t_word));
+    if (!word)
+        return NULL;
+	word->word = strdup(str);
+    if (!word->word) {
+        free(word);
+        return NULL;
+    }
+
+    word->len = len;
+    word->type = type;
     return word;
 }
 int	matrixify(t_tokens *tokens)
@@ -422,9 +437,20 @@ void	free_tokens(t_tokens *tokens)
 void	print_wrd_format(char *format_str, t_word word)
 {
 	if (!format_str)
-		printf("{%d}%s<", word.type, word.word);
-	else
-		printf(format_str, word.type, word.word);
+    {
+		printf("{%d}:", word.type);
+		if (word.type == 1 || word.type == 2)
+			printf(" >>%s<<\n", word.word);
+		else
+			printf(" %s\n", word.word);
+    }
+    else
+    {
+        if (word.type == 1 || word.type == 2)
+            printf(format_str, word.word);
+        else
+            printf(format_str, word.word);
+    }
 }
 
 void	print_tokens(t_tokens *tokens)
@@ -528,7 +554,7 @@ void	pwd(void)
 	}
 }
 
-int	echo(char **args)
+/*int	echo(char **args)
 {
 	bool	print_line;
 
@@ -551,7 +577,49 @@ int	echo(char **args)
 	if (print_line)
 		printf("\n");
 	return (EXIT_SUCCESS);
+}*/
+
+int echo(const char **args)
+{
+    bool print_line = true;
+    args++;
+
+    if (*args && strcmp(*args, "-n") == 0)
+    {
+        print_line = false;
+        args++;
+    }
+
+    while (*args != NULL)
+    {
+        // Manejo de comillas
+        const char *arg = *args;
+        size_t arg_len = strlen(arg);
+
+        if (arg_len >= 2 && ((arg[0] == '"' && arg[arg_len - 1] == '"') || (arg[0] == '\'' && arg[arg_len - 1] == '\'')))
+        {
+            // Si la cadena comienza y termina con comillas simples o dobles, imprímela sin las comillas
+            printf("%.*s", (int)arg_len - 2, arg + 1);
+        }
+        else
+        {
+            // Si no, imprime la cadena normalmente
+            printf("%s", arg);
+        }
+
+        args++;
+
+        if (*args != NULL)
+            printf(" ");
+    }
+
+    if (print_line)
+        printf("\n");
+
+    return EXIT_SUCCESS;
 }
+
+
 
 void	ft_env(char *input, char *env[])
 {
@@ -674,7 +742,8 @@ void	is_command(char *input)
 	{
 		if (strcmp(args[0], "echo") == 0)
 		{
-			echo(args);
+			const char **const_args = (const char **)args;  // Conversión de tipo
+            echo(const_args);
 			printf("Comando ejecutado 🤓\n");
 		}	//if (ft_strcmp(input, "echo") == 0)
 	}

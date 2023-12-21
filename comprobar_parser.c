@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/20 20:13:03 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/21 15:35:47 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <limits.h>
 # include <unistd.h>
 # include <stdbool.h>
+# include <sys/errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 // Estructuras
@@ -198,7 +199,27 @@ int	parse_string(t_tokens *tokens, char *str)
 
 int	parser(t_tokens **tokens, char *str, char **env)
 {
-	if (!*tokens)
+	/*if (!*tokens)
+	{
+		*tokens = init_token(env);
+		if (!*tokens)
+		{
+			printf("Error: oe tu token no funciona\n");
+			return (1);
+		}
+	}
+	(*tokens)->env = env;
+	(*tokens)->error = 0;
+	if (check_input(str))
+		return (42);
+	parse_string(*tokens, str);
+	if ((*tokens)->error == 0)
+	{
+		matrixify(*tokens);
+		add_history(str);
+	}
+	return ((*tokens)->error);*/
+		if (!*tokens)
 	{
 		*tokens = init_token(env);
 		if (!*tokens)
@@ -260,9 +281,9 @@ int	is_marks(t_tokens *tokens, char *str)
 	if (len == 0)
 		return (len);
 	if (str[0] == '"')
-		add_words(tokens, str + 1, len - 2, 2);
-	else if (str[0] == '\'')
-		add_words(tokens, str + 1, len - 2, 1);
+		add_words(tokens, str + 1, len, 2);
+	else if (str[0] == '\'') //despues prueba poniendo esto como if
+		add_words(tokens, str + 1, len, 1);
 	return (len + 2);
 }
 
@@ -290,9 +311,44 @@ t_tokens	*init_token(char **env)
 	return (tokens);
 }
 
+int	ft_strlen(const char *s)
+{
+	size_t	i;
+
+	if (!s)
+		return (0);
+	i = 0;
+	while (*s++)
+		i++;
+	return (i);
+}
+
+char	*ft_strdup(const char *s)
+{
+	size_t	len;
+	int		i;
+	char	*dup;
+
+	len = ft_strlen(s);
+	dup = (char *) malloc(sizeof(char) * (len + 1));
+	if (dup == NULL)
+	{
+		errno = ENOMEM;
+		return (NULL);
+	}
+	i = 0;
+	while (s[i])
+	{
+		dup[i] = s[i];
+		i++;
+	}
+	dup[i] = '\0';
+	return (dup);
+}
+
 int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 {
-    /*t_word *new_word = create_word(str, len, type);
+	t_word *new_word = create_word(str, len, type);
     if (!new_word)
 		return 0;
 	tokens->size += 1;
@@ -313,8 +369,8 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 	tokens->words = new_array;
 	//free(new_word->word);
 	free(new_word);
-	return (1);*/
-    if (type == ARGUMENTS)
+	return (1);
+    /*if (type == ARGUMENTS)
     {
         // Ajustar la lógica para reconocer correctamente ">>" como APPEND
         if (len >= 2 && str[0] == '>' && str[1] == '>')
@@ -329,45 +385,45 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
     }
 
     // Copiar la cadena y eliminar comillas si existen alrededor
-    char *word_copy = strndup(str, len);
+    char *word_copy = ft_strdup(str);
     if (!word_copy)
         return 0;
-
-    if ((word_copy[0] == '"' && word_copy[len - 1] == '"') || (word_copy[0] == '\'' && word_copy[len - 1] == '\''))
-    {
-        free(word_copy);
-        word_copy = strndup(str + 1, len - 2);
-        if (!word_copy)
-            return 0;
-    }
-
-    t_word *new_word = create_word(word_copy, strlen(word_copy), type);
+	t_word *new_word = create_word(word_copy, strlen(word_copy), type);
     free(word_copy); // Liberar la copia después de usarla
     if (!new_word)
         return 0;
 
     size_t new_size = tokens->size + 1;
 
-    t_word *new_array = realloc(tokens->words, new_size * sizeof(t_word));
-    if (!new_array)
+    t_word *new_array = (t_word *)malloc(new_size * sizeof(t_word));
+	if (!new_array)
     {
         free(new_word->word);
         free(new_word);
         return 0;
     }
+	memcpy(new_array, tokens->words, tokens->size * sizeof(t_word));
 
+    // Agregar la nueva palabra al final del nuevo array
+    new_array[tokens->size] = *new_word;
+
+    // Liberar el antiguo array y actualizar la referencia
+    free(tokens->words);
     tokens->words = new_array;
-    tokens->words[tokens->size] = *new_word;
     tokens->size = new_size;
-
-    free(new_word);
-
-    return 1;
+    free(new_word);*/
+    //tokens->words = new_array;
+    //tokens->words[tokens->size] = *new_word;
+    //tokens->size = new_size;
+    //free(new_word);
+    //return 1;
 }
+
+char	*ft_substr(char const *s, unsigned int start, size_t len);
 
 t_word *create_word(char *str, size_t len, int type)
 {
-    /*t_word *word = malloc(sizeof(t_word));
+    t_word *word = (t_word *)malloc(sizeof(t_word));
     
 	if (!word)
         return NULL;
@@ -383,10 +439,10 @@ t_word *create_word(char *str, size_t len, int type)
     word->type = type;
     while (len-- > 0)
 	{
-        word->word[len] = str[len];
+       word->word[len] = str[len];
 	}
-    return word;*/
-   t_word *word = malloc(sizeof(t_word));
+    return (word);
+   /*t_word *word = malloc(sizeof(t_word));
     if (!word)
         return NULL;
 	word->word = strdup(str);
@@ -397,7 +453,7 @@ t_word *create_word(char *str, size_t len, int type)
 
     word->len = len;
     word->type = type;
-    return word;
+    return word;*/
 }
 int	matrixify(t_tokens *tokens)
 {
@@ -415,7 +471,7 @@ int	matrixify(t_tokens *tokens)
 	i = 0;
 	while (i < tokens->size)
 	{
-		tokens->env[i] = strdup(word[i].word);
+		tokens->env[i] = ft_strdup(word[i].word);
 		if (!tokens->env[i])
 			return 0;
 		/*memcpy(tokens->env[i]->env_cpy, word[i].word, word[i].len);
@@ -436,7 +492,7 @@ void	free_tokens(t_tokens *tokens)
 
 void	print_wrd_format(char *format_str, t_word word)
 {
-	if (!format_str)
+	/*if (!format_str)
     {
 		printf("{%d}:", word.type);
 		if (word.type == 1 || word.type == 2)
@@ -450,7 +506,11 @@ void	print_wrd_format(char *format_str, t_word word)
             printf(format_str, word.word);
         else
             printf(format_str, word.word);
-    }
+    }*/
+	if (!format_str)
+		printf("{%d}%s<", word.type, word.word);
+	else
+		printf(format_str, word.type, word.word);
 }
 
 void	print_tokens(t_tokens *tokens)
@@ -639,31 +699,20 @@ void	ft_env(char *input, char *env[])
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	size_t	s_len;
-	char	*s_str;
-	size_t	i;
+    size_t s_len = strlen(s);
+    if (start >= s_len)
+        return NULL;
+    if (start + len > s_len)
+        len = s_len - start;
 
-	if (!s)
-		return (NULL);
-	s_len = strlen(s);
-	if (start >= s_len)
-		return (NULL);
-	if (start + len > s_len)
-		len = s_len - start;
-	s_str = (char *)malloc((len + 1) * sizeof(char));
-	if (!s_str)
-		return (NULL);
-	while (*s && start--)
-		s++;
-	i = 0;
-	while (*s && i < len)
-	{
-		s_str[i] = *s;
-		i++;
-		s++;
-	}
-	s_str[i] = '\0';
-	return (s_str);
+    char *s_str = (char *)malloc((len + 1) * sizeof(char));
+    if (!s_str)
+        return NULL;
+
+    memcpy(s_str, s + start, len);
+    s_str[len] = '\0';
+
+    return s_str;
 }
 
 static char	**ft_freeall(char **tab, size_t i)
@@ -785,7 +834,9 @@ int	main(int argc, char **argv, char **env)
 	//free_all();
 	return (0);
 }
-/* main que sirve no eliminar*/
+
+/*		MAIN PARA CONFIRMAR PARSER SI FUNCIONA CORRECTAMENTE	*/
+
 /*int main()
 {
     char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno

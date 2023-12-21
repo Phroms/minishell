@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/21 15:35:47 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/21 20:42:56 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,23 +126,33 @@ int	check_input(char *str)
 	{
 		if (str[i] == '>' || str[i] == '<' || str[i] == '|')
 		{
-			if (str[i + 1] == '>' || str[i + 1] == '<')
+			if (str[i + 1] == '>' || str[i + 1] == '<' || str[i] + 1 == '|')
 			{
 				printf("syntax error near unexpected token '%c'\n", str[i]);
 				return 1;
 			}
-		}
-		else if (str[i] == '|')
-		{
-			if (str[i + 1] == '|')
-			{
-				printf("syntax error near unexpected token '|'\n");
-				return (1);
-			}
-		}
-		i++;
-	}
-	return (0);
+			else if (str[i + 1] == '|' || str[i + 1] == '\0')
+            {
+                printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
+                return 1;
+            }
+        }
+        else if (str[i] == '|')
+        {
+            if (str[i + 1] == '|')
+            {
+                printf("error de sintaxis cerca de un token inesperado '|'\n");
+                return 1;
+            }
+            else if (str[i + 1] == '>' || str[i + 1] == '<')
+            {
+                printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
+                return 1;
+            }
+        }
+        i++;
+    }
+    return 0;
 }
 
 int	break_token(t_tokens *tokens, char *str)

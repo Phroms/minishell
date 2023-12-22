@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/21 20:42:56 by agrimald         ###   ########.fr       */
+/*   Updated: 2023/12/22 17:49:28 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,36 @@ int	check_rd(char *str, int i)
 
 int	check_input(char *str)
 {
+	/*while (*str)
+    {
+        if ((*str == '>' || *str == '<' || *str == '|') &&
+            (str[1] == '>' || str[1] == '<' || str[1] == '|' || str[1] == '\0'))
+        {
+            printf("syntax error near unexpected token '%c%c'\n", *str, str[1]);
+            return 1;
+        }
+        else if (*str == '|' && (str[1] == '|' || str[1] == '>' || str[1] == '<'))
+        {
+            printf("syntax error near unexpected token '%c%c'\n", *str, str[1]);
+            return 1;
+        }
+        else if ((*str == '>' || *str == '<' || *str == '|') && str[1] == '\0')
+        {
+            printf("syntax error near unexpected token '%c'\n", *str);
+            return 1;
+        }
+
+        str++;
+    }
+
+    if (*(str - 1) == '\n')
+    {
+        printf("syntax error near unexpected token `newline'\n");
+        return 1;
+    }
+
+    return 0;
+}*/
 	int i;
 
 	i = 0;
@@ -801,7 +831,7 @@ void	is_command(char *input)
 	{
 		if (strcmp(args[0], "echo") == 0)
 		{
-			const char **const_args = (const char **)args;  // Conversión de tipo
+			const char **const_args = (const char **)args;
             echo(const_args);
 			printf("Comando ejecutado 🤓\n");
 		}	//if (ft_strcmp(input, "echo") == 0)

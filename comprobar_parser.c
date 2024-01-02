@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2023/12/22 17:49:28 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/02 18:27:55 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ int	check_rd(char *str, int i)
 
 int	check_input(char *str)
 {
-	/*while (*str)
+	while (*str)
     {
         if ((*str == '>' || *str == '<' || *str == '|') &&
             (str[1] == '>' || str[1] == '<' || str[1] == '|' || str[1] == '\0'))
@@ -140,7 +140,6 @@ int	check_input(char *str)
 
         str++;
     }
-
     if (*(str - 1) == '\n')
     {
         printf("syntax error near unexpected token `newline'\n");
@@ -148,8 +147,8 @@ int	check_input(char *str)
     }
 
     return 0;
-}*/
-	int i;
+}
+	/*int i;
 
 	i = 0;
 	while (str[i] != '\0')
@@ -158,12 +157,14 @@ int	check_input(char *str)
 		{
 			if (str[i + 1] == '>' || str[i + 1] == '<' || str[i] + 1 == '|')
 			{
-				printf("syntax error near unexpected token '%c'\n", str[i]);
+				//printf("syntax error near unexpected token '%c'\n", str[i]);
+				printf("syntax error near unexpected token `newline'\n");
 				return 1;
 			}
 			else if (str[i + 1] == '|' || str[i + 1] == '\0')
             {
-                printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
+                //printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
+				printf("syntax error near unexpected token `newline'\n");
                 return 1;
             }
         }
@@ -171,19 +172,21 @@ int	check_input(char *str)
         {
             if (str[i + 1] == '|')
             {
-                printf("error de sintaxis cerca de un token inesperado '|'\n");
+                //printf("error de sintaxis cerca de un token inesperado '|'\n");
+				printf("syntax error near unexpected token `newline'\n");
                 return 1;
             }
             else if (str[i + 1] == '>' || str[i + 1] == '<')
             {
-                printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
+                //printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
+				printf("syntax error near unexpected token `newline'\n");
                 return 1;
             }
         }
         i++;
     }
     return 0;
-}
+}*/
 
 int	break_token(t_tokens *tokens, char *str)
 {
@@ -818,8 +821,10 @@ char	**ft_split(char const *s, char c)
 }
 //funcion que vera si hara comandos
 
-void	is_command(char *input)
+void	is_command(char *input, int error)
 {
+	if (error)
+		return;
 	if (strcmp(input, "pwd") == 0)
 	{
 		pwd();
@@ -833,7 +838,7 @@ void	is_command(char *input)
 		{
 			const char **const_args = (const char **)args;
             echo(const_args);
-			printf("Comando ejecutado 🤓\n");
+			printf("Uyyyy Comando ejecutado 🥵\n");
 		}	//if (ft_strcmp(input, "echo") == 0)
 	}
 }
@@ -863,7 +868,7 @@ int	main(int argc, char **argv, char **env)
 		err = parser(&tokens, input, env);
 		if (tokens != NULL)
 		{
-			is_command(input);
+			is_command(input, err);
 			//free_tokens(tokens); este free_tokens no porque ya liberamos en el parser;
 			// igualamos tokens a NULL;
 		}

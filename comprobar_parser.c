@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/02 18:27:55 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:14:18 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,45 +148,6 @@ int	check_input(char *str)
 
     return 0;
 }
-	/*int i;
-
-	i = 0;
-	while (str[i] != '\0')
-	{
-		if (str[i] == '>' || str[i] == '<' || str[i] == '|')
-		{
-			if (str[i + 1] == '>' || str[i + 1] == '<' || str[i] + 1 == '|')
-			{
-				//printf("syntax error near unexpected token '%c'\n", str[i]);
-				printf("syntax error near unexpected token `newline'\n");
-				return 1;
-			}
-			else if (str[i + 1] == '|' || str[i + 1] == '\0')
-            {
-                //printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
-				printf("syntax error near unexpected token `newline'\n");
-                return 1;
-            }
-        }
-        else if (str[i] == '|')
-        {
-            if (str[i + 1] == '|')
-            {
-                //printf("error de sintaxis cerca de un token inesperado '|'\n");
-				printf("syntax error near unexpected token `newline'\n");
-                return 1;
-            }
-            else if (str[i + 1] == '>' || str[i + 1] == '<')
-            {
-                //printf("error de sintaxis cerca de un token inesperado '%c'\n", str[i]);
-				printf("syntax error near unexpected token `newline'\n");
-                return 1;
-            }
-        }
-        i++;
-    }
-    return 0;
-}*/
 
 int	break_token(t_tokens *tokens, char *str)
 {
@@ -313,7 +274,7 @@ int	dst_dots(char *str, char dot)
 
 int	is_marks(t_tokens *tokens, char *str)
 {
-	int	len;
+	/*int	len;
 
 	len = dst_dots(str, str[0]);
 	if (len == -1 || len == -2)
@@ -324,10 +285,32 @@ int	is_marks(t_tokens *tokens, char *str)
 	if (len == 0)
 		return (len);
 	if (str[0] == '"')
-		add_words(tokens, str + 1, len, 2);
+		add_words(tokens, str + 1, len - 2, 2);
 	else if (str[0] == '\'') //despues prueba poniendo esto como if
-		add_words(tokens, str + 1, len, 1);
-	return (len + 2);
+		add_words(tokens, str + 1, len - 2, 1);
+	else
+		add_words(tokens, str, len, 0);
+	return (len + 2);*/
+	int len = dst_dots(str, str[0]);
+    if (len == -1 || len == -2)
+    {
+        tokens->error = 1;
+        return 1;
+    }
+    if (len == 0)
+        return len;
+
+    // Eliminar comillas dobles o simples alrededor de la palabra
+    if (len >= 2 && (str[0] == '"' || str[0] == '\'') && str[0] == str[len - 1])
+    {
+        add_words(tokens, str + 1, len - 2, 0);
+    }
+    else
+    {
+        add_words(tokens, str, len, 0);
+    }
+
+    return len + 2;
 }
 
 int	is_space(t_tokens *tokens, char *str)
@@ -391,7 +374,31 @@ char	*ft_strdup(const char *s)
 
 int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 {
-	t_word *new_word = create_word(str, len, type);
+	if (type == 2 || type == 1)
+    {
+		if (len >= 2 && (str[0] == '"' || str[0] == '\'') && str[0] == str[len - 1])
+		{
+			str++;
+			len -= 2;
+		}
+    }
+    t_word *new_word = create_word(str, len, type);
+    if (!new_word)
+        return 0;
+
+    tokens->size += 1;
+    t_word *new_array = realloc(tokens->words, tokens->size * sizeof(t_word));
+    if (!new_array)
+    {
+        free(new_word->word);
+        free(new_word);
+        return 0;
+    }
+    new_array[tokens->size - 1] = *new_word;
+    tokens->words = new_array;
+    free(new_word);
+    return 1;
+	/*t_word *new_word = create_word(str, len, type);
     if (!new_word)
 		return 0;
 	tokens->size += 1;
@@ -412,7 +419,7 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 	tokens->words = new_array;
 	//free(new_word->word);
 	free(new_word);
-	return (1);
+	return (1);*/
     /*if (type == ARGUMENTS)
     {
         // Ajustar la lógica para reconocer correctamente ">>" como APPEND
@@ -681,10 +688,72 @@ void	pwd(void)
 		printf("\n");
 	return (EXIT_SUCCESS);
 }*/
+/*static int	ft_count_char(const char *str, char c)
+{
+	int i;
+	int count;
+
+	i = 0;
+	count = 0;
+	while(str[i])
+	{
+		if (str[i] == c)
+			count++;
+		i++;
+	}
+	return (count);
+}*/
 
 int echo(const char **args)
 {
-    bool print_line = true;
+	    bool print_line = true;
+    args++; // Avanzar al primer argumento después de "echo"
+
+    if (*args && strncmp(*args, "-n", strlen("-n") + 1) == 0)
+    {
+        print_line = false;
+        args++;
+    }
+
+    while (*args != NULL)
+    {
+        const char *arg = *args;
+        size_t arg_len = strlen(arg);
+
+        if (arg_len >= 2 && ((arg[0] == '"' && arg[arg_len - 1] == '"') || (arg[0] == '\'' && arg[arg_len - 1] == '\'')))
+        {
+            // Si la cadena comienza y termina con comillas simples o dobles, imprímela sin las comillas
+            printf("%.*s", (int)arg_len - 2, arg + 1);
+        }
+        else
+        {
+            // Si no, imprimir la cadena normalmente
+            // Eliminar comillas dentro de la cadena
+            const char *quote = strpbrk(arg, "\"\'");
+            while (quote != NULL)
+            {
+                size_t chunk_len = quote - arg;
+                printf("%.*s", (int)chunk_len, arg);
+
+                arg = quote + 1; // Saltar la comilla encontrada
+                quote = strpbrk(arg, "\"\'");
+            }
+
+            // Imprimir el resto de la cadena
+            printf("%s", arg);
+        }
+
+        args++;
+
+        if (*args != NULL)
+            printf(" ");
+    }
+
+    if (print_line)
+        printf("\n");
+
+    return 0; // Éxito
+	/*bool print_line = true;
     args++;
 
     if (*args && strcmp(*args, "-n") == 0)
@@ -719,7 +788,7 @@ int echo(const char **args)
     if (print_line)
         printf("\n");
 
-    return EXIT_SUCCESS;
+    return EXIT_SUCCESS;*/
 }
 
 

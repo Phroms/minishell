@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/04 16:14:18 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/05 20:27:31 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 # include <signal.h>
 # include <ctype.h>
 # include <limits.h>
 # include <unistd.h>
 # include <stdbool.h>
 # include <sys/errno.h>
-# include <readline/readline.h>
-# include <readline/history.h>
+
 // Estructuras
 
 typedef struct s_word
@@ -223,7 +224,7 @@ int	parser(t_tokens **tokens, char *str, char **env)
 		add_history(str);
 	}
 	return ((*tokens)->error);*/
-		if (!*tokens)
+	if (!*tokens)
 	{
 		*tokens = init_token(env);
 		if (!*tokens)
@@ -274,7 +275,7 @@ int	dst_dots(char *str, char dot)
 
 int	is_marks(t_tokens *tokens, char *str)
 {
-	/*int	len;
+	int	len;
 
 	len = dst_dots(str, str[0]);
 	if (len == -1 || len == -2)
@@ -285,13 +286,13 @@ int	is_marks(t_tokens *tokens, char *str)
 	if (len == 0)
 		return (len);
 	if (str[0] == '"')
-		add_words(tokens, str + 1, len - 2, 2);
+		add_words(tokens, str + 1, len, 2);
 	else if (str[0] == '\'') //despues prueba poniendo esto como if
-		add_words(tokens, str + 1, len - 2, 1);
+		add_words(tokens, str + 1, len, 1);
 	else
 		add_words(tokens, str, len, 0);
-	return (len + 2);*/
-	int len = dst_dots(str, str[0]);
+	return (len + 2);
+	/*int len = dst_dots(str, str[0]);
     if (len == -1 || len == -2)
     {
         tokens->error = 1;
@@ -310,7 +311,7 @@ int	is_marks(t_tokens *tokens, char *str)
         add_words(tokens, str, len, 0);
     }
 
-    return len + 2;
+    return len + 2;*/
 }
 
 int	is_space(t_tokens *tokens, char *str)
@@ -374,7 +375,7 @@ char	*ft_strdup(const char *s)
 
 int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 {
-	if (type == 2 || type == 1)
+	/*if (type == 2 || type == 1)
     {
 		if (len >= 2 && (str[0] == '"' || str[0] == '\'') && str[0] == str[len - 1])
 		{
@@ -397,8 +398,8 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
     new_array[tokens->size - 1] = *new_word;
     tokens->words = new_array;
     free(new_word);
-    return 1;
-	/*t_word *new_word = create_word(str, len, type);
+    return 1;*/
+	t_word *new_word = create_word(str, len, type);
     if (!new_word)
 		return 0;
 	tokens->size += 1;
@@ -419,7 +420,7 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 	tokens->words = new_array;
 	//free(new_word->word);
 	free(new_word);
-	return (1);*/
+	return (1);
     /*if (type == ARGUMENTS)
     {
         // Ajustar la lógica para reconocer correctamente ">>" como APPEND
@@ -664,6 +665,153 @@ void	pwd(void)
 	}
 }
 
+	/*		COMIENZO DEL EXIT		*/
+
+// al hacer '$?' despues de un exit significa que te dara un valor es decir:
+// dara 0: en caso de exito, que indica que el comando se ejecuto sin errores.
+// ejemplo:
+// 			echo "hola como estan?"
+// 			hola como estan
+// 			echo $?
+// 			0
+// dara 1-125: significa que dio errores generales o condiciones de salida anormales.
+// ejemplo:
+// 			ls archivo_inexistente
+// 			ls: archivo_inexistente: No such file or directory
+// 			echo $?
+// 			1
+// dara 126: significa que no se puede ejecutar el comando. Puede deberse a permisos insuficientes, el comando no encontrado, etc.
+// ejemplo:
+// 			./mi_script.sh
+//			bash: ./mi_script.sh: Permission denied
+//			echo $?
+//			126
+// dara 127: cuando el comando no pude ser encontrado.
+// ejemplo:
+// 			horse
+// 			bash: horse: command not found
+// 			echo $?
+// 			127
+
+/*		IDEAS DEL EXIT		*/
+
+typedef struct {
+    int power_on;
+    int exit_code;
+    char* input;
+} YourShell;
+
+long long int ft_atol_sh(char *str);
+int p_exit_err(char *str_error, int option);
+
+int arg_count(char **grid)
+{
+    int i;
+    for (i = 0; grid[i] != NULL; i++);
+    return i;
+}
+
+int check_exit(char *s)
+{
+    int i = 0;
+    while (s[i] == ' ')
+        i++;
+    if (!s[i])
+        return p_exit_err(s, 1);
+    if ((s[i] == '-' || s[i] == '+') && s[i + 1] && isdigit(s[i + 1]))
+        i++;
+    while (s[i] && isdigit(s[i]))
+        i++;
+    while (s[i] && s[i] == ' ')
+        i++;
+    if (s[i])
+        return p_exit_err(s, 1);
+    return ft_atol_sh(s);
+}
+
+int p_exit_err(char *str_error, int option)
+{
+    if (option == 1)
+    {
+        printf("minishell: exit: %s: numeric argument required\n", str_error);
+        return 255;
+    }
+    else
+    {
+        printf("%s", str_error);
+        return 1;
+    }
+}
+
+long long int ft_atol_sh(char *str)
+{
+    int i = 0;
+    int sign = 1;
+    long long number = 0;
+
+    // Implementación de ft_atol_sh
+
+    return number * sign;
+}
+
+int ft_exit(YourShell *sh)
+{
+    char *input;
+    int ex = 255;
+
+    if (sh->input == NULL || strcmp(sh->input, "exit") == 0)
+    {
+        sh->power_on = 0;
+        printf("Chao\n");
+        return sh->exit_code;
+    }
+    else
+    {
+        ex = 255;
+        if (arg_count(/* Aquí tus argumentos específicos */) > 2)
+            return p_exit_err("minishell: exit: too many arguments\n", 2);
+
+        sh->power_on = 0;
+        input = /* Aquí obtén el argumento necesario */;
+        printf("Chao\n");
+
+        if (input[0] == '\0')
+            p_exit_err(input, 1);
+        else
+            ex = check_exit(input);
+    }
+    return ex;
+}
+
+int main()
+{
+    YourShell myShell = {1, 0, NULL}; // Inicializa según tu estructura
+    // Otros códigos de inicialización
+
+    while (myShell.power_on)
+    {
+        // Lógica principal de tu shell
+        // ...
+
+        // Verifica si el comando es "exit"
+        if (strcmp(myShell.input, "exit") == 0)
+        {
+            myShell.exit_code = ft_exit(&myShell);
+            break;
+        }
+
+        // Obtén la entrada del usuario u otras operaciones
+        // ...
+
+        // Asigna la entrada a myShell.input
+        // myShell.input = ...
+
+        // ...
+    }
+
+    return 0;
+}
+
 /*int	echo(char **args)
 {
 	bool	print_line;
@@ -890,6 +1038,12 @@ char	**ft_split(char const *s, char c)
 }
 //funcion que vera si hara comandos
 
+void	exit_cmd(void)
+{
+	printf("No te vayas quedate, conmigo... 😞\n");
+	exit(0);
+}
+
 void	is_command(char *input, int error)
 {
 	if (error)
@@ -907,14 +1061,17 @@ void	is_command(char *input, int error)
 		{
 			const char **const_args = (const char **)args;
             echo(const_args);
-			printf("Uyyyy Comando ejecutado 🥵\n");
+			printf("Uyyyy papi comando ejecutado 🥵\n");
 		}	//if (ft_strcmp(input, "echo") == 0)
+	}
+	if (strcmp(args[0], "exit") == 0)
+	{
+		exit_cmd();
 	}
 }
 	/* if (ft_strcmp(input, "cd") == 0)
 		hacer mi comando cd;
 	podemos hacer un ft_strcmp(str, cm d) */
-
 
 // NO ELIMINAR ESTE MAIN ꜜ
 int	main(int argc, char **argv, char **env)

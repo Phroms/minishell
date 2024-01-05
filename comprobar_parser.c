@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/05 20:27:31 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/05 20:56:54 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -692,6 +692,21 @@ void	pwd(void)
 // 			bash: horse: command not found
 // 			echo $?
 // 			127
+
+	/*		OTROS EJEMPLOS		*/
+
+// EL NOMBRE DE "$?" ES "STATUS VARIABLE" o "VARIABLE DE ESTADO"
+// "STATUS VARIABLE" ➜ Es una variable especial que almacena el código de salida del último comando ejecutado en la terminal.
+//bash-3.2$: exit 123 (LO QUE LE ENVIAMOS)
+//exit (RESULTADO)
+//➜  Desktop echo $? (STATUS VARIABLE ➜ "$?")
+//123 (EL RESULTADO QUE DA) (AUN FALTA COMPRENDER)
+//
+//bash-3.2$: exit 123 456 (LO QUE LE ENVIAMOS)
+//exit (RESULTADO)
+//bash: exit: too many arguments (RESULTADO DE BASH)
+//bash-3.2$ echo $? (STATUS VARIABLE ➜ "$?")
+//1 (AQUI SE CUMPLE EL ERROR DE 1-125)
 
 /*		IDEAS DEL EXIT		*/
 

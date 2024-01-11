@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/05 20:56:54 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/11 21:47:48 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ typedef struct s_tokens
 
 typedef struct s_env
 {
+	char	*key;
+	char	*value;
 	char	*env_cpy;
 }	t_env;
-
-
 
 typedef struct s_pcs
 {
@@ -708,125 +708,6 @@ void	pwd(void)
 //bash-3.2$ echo $? (STATUS VARIABLE ➜ "$?")
 //1 (AQUI SE CUMPLE EL ERROR DE 1-125)
 
-/*		IDEAS DEL EXIT		*/
-
-typedef struct {
-    int power_on;
-    int exit_code;
-    char* input;
-} YourShell;
-
-long long int ft_atol_sh(char *str);
-int p_exit_err(char *str_error, int option);
-
-int arg_count(char **grid)
-{
-    int i;
-    for (i = 0; grid[i] != NULL; i++);
-    return i;
-}
-
-int check_exit(char *s)
-{
-    int i = 0;
-    while (s[i] == ' ')
-        i++;
-    if (!s[i])
-        return p_exit_err(s, 1);
-    if ((s[i] == '-' || s[i] == '+') && s[i + 1] && isdigit(s[i + 1]))
-        i++;
-    while (s[i] && isdigit(s[i]))
-        i++;
-    while (s[i] && s[i] == ' ')
-        i++;
-    if (s[i])
-        return p_exit_err(s, 1);
-    return ft_atol_sh(s);
-}
-
-int p_exit_err(char *str_error, int option)
-{
-    if (option == 1)
-    {
-        printf("minishell: exit: %s: numeric argument required\n", str_error);
-        return 255;
-    }
-    else
-    {
-        printf("%s", str_error);
-        return 1;
-    }
-}
-
-long long int ft_atol_sh(char *str)
-{
-    int i = 0;
-    int sign = 1;
-    long long number = 0;
-
-    // Implementación de ft_atol_sh
-
-    return number * sign;
-}
-
-int ft_exit(YourShell *sh)
-{
-    char *input;
-    int ex = 255;
-
-    if (sh->input == NULL || strcmp(sh->input, "exit") == 0)
-    {
-        sh->power_on = 0;
-        printf("Chao\n");
-        return sh->exit_code;
-    }
-    else
-    {
-        ex = 255;
-        if (arg_count(/* Aquí tus argumentos específicos */) > 2)
-            return p_exit_err("minishell: exit: too many arguments\n", 2);
-
-        sh->power_on = 0;
-        input = /* Aquí obtén el argumento necesario */;
-        printf("Chao\n");
-
-        if (input[0] == '\0')
-            p_exit_err(input, 1);
-        else
-            ex = check_exit(input);
-    }
-    return ex;
-}
-
-int main()
-{
-    YourShell myShell = {1, 0, NULL}; // Inicializa según tu estructura
-    // Otros códigos de inicialización
-
-    while (myShell.power_on)
-    {
-        // Lógica principal de tu shell
-        // ...
-
-        // Verifica si el comando es "exit"
-        if (strcmp(myShell.input, "exit") == 0)
-        {
-            myShell.exit_code = ft_exit(&myShell);
-            break;
-        }
-
-        // Obtén la entrada del usuario u otras operaciones
-        // ...
-
-        // Asigna la entrada a myShell.input
-        // myShell.input = ...
-
-        // ...
-    }
-
-    return 0;
-}
-
 /*int	echo(char **args)
 {
 	bool	print_line;
@@ -954,11 +835,9 @@ int echo(const char **args)
     return EXIT_SUCCESS;*/
 }
 
-
-
-void	ft_env(char *input, char *env[])
+void	ft_env(char *input, char *env_cpy)
 {
-	int	i;
+	/*int	i;
 
 	i = 0;
 	if (input[0] == 'e' && input[1] == 'n' \
@@ -969,7 +848,74 @@ void	ft_env(char *input, char *env[])
 			printf("%s\n", env[i]);
 			i++;
 		}
+	}*/
+	int i = 0;
+	
+	if (strcmp(input, "env") == 0)
+	{
+		while (env[i])
+		{
+			printf("%s\n", env[i]);
+			i++;
+		}
 	}
+}
+
+void	print_export(t_env *env)
+{
+	while (env->key)
+	{
+		printf("%s=%s\n", env->key, env->value);
+		env++;
+	}
+}
+
+void	set_export(t_env *env, const char *key, const char *value)
+{
+	while (env->key)
+	{
+		if (strcmp(env->key, key) == 0)
+		{
+			free(env->value);
+			env->value = strdup(value);
+			return;
+		}
+		env++;
+	}
+	env->key = strdup(key);
+	env->value = strdup(value);
+}
+
+void	export_command(t_env *env, const char *arg)
+{
+	const char *equal_signo = strchr(arg, '=');
+	
+	if (!equal_signo || equal_signo == arg)
+	{
+		printf("Error papu\n");
+		return;
+	}
+	size_t	key_len = equal_signo - arg;
+	char	*key = strndup(arg, key_len);
+	const char *value = equal_signo + 1;
+
+	int i = 0;
+
+	while(env[i].key)
+	{
+		if (strcmp(env[i].key, key) == 0)
+		{
+			free(env[i].value);
+			env[i].value = strdup(value);
+			free(key);
+			return ;
+		}
+		i++;
+	}
+	env[i].key = strdup(key);
+	env[i].value = strdup(value);
+
+	free(key);
 }
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
@@ -1053,15 +999,15 @@ char	**ft_split(char const *s, char c)
 }
 //funcion que vera si hara comandos
 
-void	exit_cmd(void)
+/*void	exit_cmd(void)
 {
 	printf("No te vayas quedate, conmigo... 😞\n");
 	exit(0);
-}
+}*/
 
-void	is_command(char *input, int error)
+void	is_command(char *input, int error, t_env *env)
 {
-	if (error)
+	/*if (error)
 		return;
 	if (strcmp(input, "pwd") == 0)
 	{
@@ -1077,17 +1023,53 @@ void	is_command(char *input, int error)
 			const char **const_args = (const char **)args;
             echo(const_args);
 			printf("Uyyyy papi comando ejecutado 🥵\n");
-		}	//if (ft_strcmp(input, "echo") == 0)
-	}
-	if (strcmp(args[0], "exit") == 0)
+		}
+		else if (strcmp(args[0], "export") == 0)
+		{
+			export_command(ft_env, *args);
+			printf("Uyyy perro ese export se ejecuto bien 🤑\n");
+		}
+	}*/
+	if (error)
+		return ;
+
+	if (strcmp(input, "pwd") == 0)
 	{
-		exit_cmd();
+		pwd();
+		printf("Comando ejecutado perrooooooooo 😎\n");
+	}
+	else
+	{
+		char **args;
+		args = ft_split(input, ' ');
+		if (args[0] != NULL)
+		{
+			if (strcmp(args[0], "echo") == 0)
+			{
+				const char **const_args = (const char **)args;
+            	echo(const_args);
+				printf("Uyyyy papi comando ejecutado 🥵\n");
+			}
+			else if (strcmp(args[0], "export") == 0)
+			{
+				export_command(env, args[1]);
+				printf("Uyyy perro ese export funciona 🤑\n");
+			}
+			else if (strcmp(args[0], "env") == 0)
+			{
+				ft_env(input, env->env_cpy);
+				printf("Uyyy ese env funca ehh 😈\n");
+			}
+			char	**arg_ptr = args;
+			while (*arg_ptr != NULL)
+			{
+				free(*arg_ptr);
+				arg_ptr++;
+			}
+			free(args);
+		}
 	}
 }
-	/* if (ft_strcmp(input, "cd") == 0)
-		hacer mi comando cd;
-	podemos hacer un ft_strcmp(str, cm d) */
-
 // NO ELIMINAR ESTE MAIN ꜜ
 int	main(int argc, char **argv, char **env)
 {
@@ -1109,7 +1091,7 @@ int	main(int argc, char **argv, char **env)
 		err = parser(&tokens, input, env);
 		if (tokens != NULL)
 		{
-			is_command(input, err);
+			is_command(input, err, env);
 			//free_tokens(tokens); este free_tokens no porque ya liberamos en el parser;
 			// igualamos tokens a NULL;
 		}

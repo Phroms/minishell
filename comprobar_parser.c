@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/11 21:47:48 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/17 19:44:57 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ typedef struct s_env
 {
 	char	*key;
 	char	*value;
-	char	*env_cpy;
+	char	**env_cpy;
 }	t_env;
 
 typedef struct s_pcs
@@ -653,7 +653,7 @@ void	signals(void)
 	signal(SIGINT, signal_ctrl_c);
 }*/
 
-void	pwd(void)
+/*void	pwd(void)
 {
 	char	*pwd;
 
@@ -663,8 +663,23 @@ void	pwd(void)
 		printf("%s\n", pwd);
 		free(pwd);
 	}
-}
+}*/
 
+int pwd(void)
+{
+    char *pwd = getcwd(NULL, 0);
+    if (pwd != NULL)
+    {
+        printf("%s\n", pwd);
+        free(pwd);
+        return 0;  // Éxito
+    }
+    else
+    {
+        printf("Error: Mano el 'pwd' no funca 🤒\n");
+        return 1;  // Error
+    }
+}
 	/*		COMIENZO DEL EXIT		*/
 
 // al hacer '$?' despues de un exit significa que te dara un valor es decir:
@@ -835,27 +850,25 @@ int echo(const char **args)
     return EXIT_SUCCESS;*/
 }
 
-void	ft_env(char *input, char *env_cpy)
+int	ft_strcmp(char *s1, char *s2)
 {
-	/*int	i;
+	size_t	i;
 
 	i = 0;
-	if (input[0] == 'e' && input[1] == 'n' \
-		&& input[2] == 'v' && input[3] == '\0')		// !ft_strcmp(input, "env")
-	{
-		while (env[i])
-		{
-			printf("%s\n", env[i]);
-			i++;
-		}
-	}*/
+	while (s1[i] == s2[i] && s1[i] && s2[i])
+		i++;
+	return (((unsigned char *)s1)[i] - ((unsigned char *)s2)[i]);
+}
+
+void	ft_env(char *input, t_env *count)
+{
 	int i = 0;
 	
-	if (strcmp(input, "env") == 0)
+	if (ft_strcmp(input, "env") == 0)
 	{
-		while (env[i])
+		while (count->env_cpy[i])
 		{
-			printf("%s\n", env[i]);
+			printf("%s\n", count->env_cpy[i]);
 			i++;
 		}
 	}
@@ -863,27 +876,46 @@ void	ft_env(char *input, char *env_cpy)
 
 void	print_export(t_env *env)
 {
-	while (env->key)
+	while (env->key != NULL)
 	{
 		printf("%s=%s\n", env->key, env->value);
 		env++;
 	}
 }
 
+void	update_env_copy(t_env *env)
+{
+	size_t env_size = 0;
+	while (env[env_size].key != NULL)
+		env_size++;
+	free(env->env_cpy);
+	env->env_cpy = malloc((env_size + 1) * sizeof(char *));
+	size_t i = 0;
+	while (env[i].key != NULL)
+	{
+		env->env_cpy[i] = env[i].key;
+		i++;
+	}
+	env->env_cpy[i] = NULL;
+}
+
 void	set_export(t_env *env, const char *key, const char *value)
 {
-	while (env->key)
+	while (env->key != NULL)
 	{
 		if (strcmp(env->key, key) == 0)
 		{
 			free(env->value);
 			env->value = strdup(value);
+			update_env_copy(env);
 			return;
 		}
 		env++;
 	}
 	env->key = strdup(key);
 	env->value = strdup(value);
+	(env + 1) ->key = NULL;
+	update_env_copy(env);
 }
 
 void	export_command(t_env *env, const char *arg)
@@ -896,26 +928,40 @@ void	export_command(t_env *env, const char *arg)
 		return;
 	}
 	size_t	key_len = equal_signo - arg;
-	char	*key = strndup(arg, key_len);
-	const char *value = equal_signo + 1;
+	char	*key = strndup(arg, key_len + 1);
+	char	*value = ft_strdup(equal_signo + 1);
 
 	int i = 0;
 
-	while(env[i].key)
+	while(env[i].key != NULL)
 	{
-		if (strcmp(env[i].key, key) == 0)
+		if (strncmp(env[i].key, key, key_len) == 0 && env[i].key[key_len] == '=')
 		{
 			free(env[i].value);
-			env[i].value = strdup(value);
+			env[i].value = ft_strdup(value);
 			free(key);
+			free(value);
+			printf("Updated variable: %s=%s\n", env[i].key, env[i].value);
 			return ;
 		}
 		i++;
 	}
+	//char *new_env = ft_strdup(arg);
+    //if (!new_env)
+    //{
+      //  printf("Error: Fallo al duplicar la cadena del entorno\n");
+        //free(key);
+		//free(value);
+        //return;
+    //}
+    //env[i] = new_env;
 	env[i].key = strdup(key);
 	env[i].value = strdup(value);
-
+	(env + 1)->key = NULL;
+	set_export(env, key, value);
 	free(key);
+	free(value);
+	printf("Added new variable: %s=%s\n", env[i].key, env[i].value);
 }
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
@@ -1044,7 +1090,7 @@ void	is_command(char *input, int error, t_env *env)
 		args = ft_split(input, ' ');
 		if (args[0] != NULL)
 		{
-			if (strcmp(args[0], "echo") == 0)
+			if (strcmp(args[0], "echo") == 0) //es un int
 			{
 				const char **const_args = (const char **)args;
             	echo(const_args);
@@ -1057,7 +1103,7 @@ void	is_command(char *input, int error, t_env *env)
 			}
 			else if (strcmp(args[0], "env") == 0)
 			{
-				ft_env(input, env->env_cpy);
+				ft_env(input, env);
 				printf("Uyyy ese env funca ehh 😈\n");
 			}
 			char	**arg_ptr = args;
@@ -1078,7 +1124,9 @@ int	main(int argc, char **argv, char **env)
 	t_tokens	*tokens = NULL;
 	char		*input;
 	int			err;
-	//t_expander	*exp;
+	t_env		my_env;
+	my_env.env_cpy = env;
+
 	
 	initialize_operator_types();
 	//signals();
@@ -1087,17 +1135,15 @@ int	main(int argc, char **argv, char **env)
 		input = readline("> ");
 		if (!input)
 			exit(0);
-		ft_env(input, env);
+		
 		err = parser(&tokens, input, env);
 		if (tokens != NULL)
 		{
-			is_command(input, err, env);
+			is_command(input, err, &my_env);
 			//free_tokens(tokens); este free_tokens no porque ya liberamos en el parser;
 			// igualamos tokens a NULL;
 		}
 		// hacer una o mas funciones que haga los comandos(cmd);
-		//exp = expander(tokens);
-		//executor();
 	}
 	//free_all();
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/17 19:44:55 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/18 17:59:46 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -886,7 +886,7 @@ void	set_export(t_env *env, const char *key, const char *value)
 	env->value = strdup(value);
 }
 
-void	export_command(t_env *env, const char *arg)
+void	export_command(char **env, const char *arg)
 {
 	const char *equal_signo = strchr(arg, '=');
 	
@@ -897,24 +897,23 @@ void	export_command(t_env *env, const char *arg)
 	}
 	size_t	key_len = equal_signo - arg;
 	char	*key = strndup(arg, key_len);
-	const char *value = equal_signo + 1;
+	//const char *value = equal_signo + 1;
 
 	int i = 0;
 
-	while(env[i].key)
+	while(env[i])
 	{
-		if (strcmp(env[i].key, key) == 0)
+		if (strcmp(env[i], key) == 0)
 		{
-			free(env[i].value);
-			env[i].value = strdup(value);
+			free(env[i]);
+			env[i] = strdup(arg);
 			free(key);
 			return ;
 		}
 		i++;
 	}
-	env[i].key = strdup(key);
-	env[i].value = strdup(value);
-
+	env[i] = strdup(arg);
+	//env[i + 1] = strdup(value);
 	free(key);
 }
 
@@ -1087,7 +1086,6 @@ int	main(int argc, char **argv, char **env)
 		input = readline("> ");
 		if (!input)
 			exit(0);
-		ft_env(input, env);
 		err = parser(&tokens, input, env);
 		if (tokens != NULL)
 		{

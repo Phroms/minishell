@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/17 19:44:57 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/18 18:00:24 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -893,7 +893,7 @@ void	update_env_copy(t_env *env)
 	size_t i = 0;
 	while (env[i].key != NULL)
 	{
-		env->env_cpy[i] = env[i].key;
+		env->env_cpy[i] = strdup(env[i].key);
 		i++;
 	}
 	env->env_cpy[i] = NULL;
@@ -914,7 +914,7 @@ void	set_export(t_env *env, const char *key, const char *value)
 	}
 	env->key = strdup(key);
 	env->value = strdup(value);
-	(env + 1) ->key = NULL;
+	(env + 1)->key = NULL;
 	update_env_copy(env);
 }
 
@@ -928,7 +928,7 @@ void	export_command(t_env *env, const char *arg)
 		return;
 	}
 	size_t	key_len = equal_signo - arg;
-	char	*key = strndup(arg, key_len + 1);
+	char	*key = strndup(arg, key_len);
 	char	*value = ft_strdup(equal_signo + 1);
 
 	int i = 0;
@@ -939,9 +939,10 @@ void	export_command(t_env *env, const char *arg)
 		{
 			free(env[i].value);
 			env[i].value = ft_strdup(value);
+			update_env_copy(env);
+			printf("Updated variable: %s=%s\n", env[i].key, env[i].value);
 			free(key);
 			free(value);
-			printf("Updated variable: %s=%s\n", env[i].key, env[i].value);
 			return ;
 		}
 		i++;
@@ -959,6 +960,7 @@ void	export_command(t_env *env, const char *arg)
 	env[i].value = strdup(value);
 	(env + 1)->key = NULL;
 	set_export(env, key, value);
+	//update_env_copy(env);
 	free(key);
 	free(value);
 	printf("Added new variable: %s=%s\n", env[i].key, env[i].value);

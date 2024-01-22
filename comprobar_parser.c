@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/18 18:00:24 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/22 19:17:00 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1100,8 +1100,13 @@ void	is_command(char *input, int error, t_env *env)
 			}
 			else if (strcmp(args[0], "export") == 0)
 			{
-				export_command(env, args[1]);
-				printf("Uyyy perro ese export funciona 🤑\n");
+				if (args[1] != NULL)
+				{
+					export_command(env, args[1]);
+					printf("Uyyy perro ese export funciona 🤑\n");
+				}
+				else
+					printf("Error papu: el export esta solo 😤\n");
 			}
 			else if (strcmp(args[0], "env") == 0)
 			{

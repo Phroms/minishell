@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/22 19:17:00 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/23 22:05:15 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -860,6 +860,9 @@ int	ft_strcmp(char *s1, char *s2)
 	return (((unsigned char *)s1)[i] - ((unsigned char *)s2)[i]);
 }
 
+#define TRUE 1
+#define FALSE 0
+
 void	ft_env(char *input, t_env *count)
 {
 	int i = 0;
@@ -874,96 +877,127 @@ void	ft_env(char *input, t_env *count)
 	}
 }
 
-void	print_export(t_env *env)
+int	mod_strcmp(char *cmd, char *env)
 {
-	while (env->key != NULL)
-	{
-		printf("%s=%s\n", env->key, env->value);
-		env++;
-	}
-}
+	int	i = 0;
 
-void	update_env_copy(t_env *env)
-{
-	size_t env_size = 0;
-	while (env[env_size].key != NULL)
-		env_size++;
-	free(env->env_cpy);
-	env->env_cpy = malloc((env_size + 1) * sizeof(char *));
-	size_t i = 0;
-	while (env[i].key != NULL)
+	while (cmd[i] && env[i])
 	{
-		env->env_cpy[i] = strdup(env[i].key);
+		if (cmd[i] == '=' && env[i] == '=')
+			return (TRUE);
+		if (cmd[i] != env[i])
+			return (FALSE);
 		i++;
 	}
-	env->env_cpy[i] = NULL;
+	if (cmd[i] == '\0' && (env[i] == '\0' || env[i] == '='))
+		return (TRUE);
+	return (FALSE);
 }
 
-void	set_export(t_env *env, const char *key, const char *value)
-{
-	while (env->key != NULL)
-	{
-		if (strcmp(env->key, key) == 0)
-		{
-			free(env->value);
-			env->value = strdup(value);
-			update_env_copy(env);
-			return;
-		}
-		env++;
-	}
-	env->key = strdup(key);
-	env->value = strdup(value);
-	(env + 1)->key = NULL;
-	update_env_copy(env);
-}
+void	bubble_sort(char **arr, int size, int i);
+void	normal_export(char *cmd, t_env *env);
+void	sort_env(t_env *env, int count, int i);
 
-void	export_command(t_env *env, const char *arg)
+void	replace_value(char *cmd, t_env *env)
 {
-	const char *equal_signo = strchr(arg, '=');
-	
-	if (!equal_signo || equal_signo == arg)
-	{
-		printf("Error papu\n");
-		return;
-	}
-	size_t	key_len = equal_signo - arg;
-	char	*key = strndup(arg, key_len);
-	char	*value = ft_strdup(equal_signo + 1);
-
 	int i = 0;
 
-	while(env[i].key != NULL)
+	while (env->env_cpy[i] != NULL)
 	{
-		if (strncmp(env[i].key, key, key_len) == 0 && env[i].key[key_len] == '=')
+		if (mod_strcmp(cmd, env->env_cpy[i]) == TRUE)
 		{
-			free(env[i].value);
-			env[i].value = ft_strdup(value);
-			update_env_copy(env);
-			printf("Updated variable: %s=%s\n", env[i].key, env[i].value);
-			free(key);
-			free(value);
-			return ;
+			free(env->env_cpy[i]);
+			env->env_cpy[i] = strdup(cmd);
+			sort_env(env, i + 1, 0);
+			return;
 		}
 		i++;
 	}
-	//char *new_env = ft_strdup(arg);
-    //if (!new_env)
-    //{
-      //  printf("Error: Fallo al duplicar la cadena del entorno\n");
-        //free(key);
-		//free(value);
-        //return;
-    //}
-    //env[i] = new_env;
-	env[i].key = strdup(key);
-	env[i].value = strdup(value);
-	(env + 1)->key = NULL;
-	set_export(env, key, value);
-	//update_env_copy(env);
-	free(key);
-	free(value);
-	printf("Added new variable: %s=%s\n", env[i].key, env[i].value);
+	//bubble_sort(env->env_cpy, i + 1, 0);
+	normal_export(cmd, env);
+	sort_env(env, i + 1, 0);
+}
+
+int	var_exist(char *cmd, t_env *env)
+{
+	int i = 0;
+
+	while (env->env_cpy[i] != NULL)
+	{
+		if (mod_strcmp(cmd, env->env_cpy[i]) == TRUE)
+			return (TRUE);
+		i++;
+	}
+	return (FALSE);
+}
+
+void	bubble_sort(char **arr, int size, int i)
+{
+	if (i == size - 1)
+		return;
+	if (strcmp(arr[i], arr[i + 1]) > 0)
+	{
+		char *tmp = arr[i];
+		arr[i] = arr[i + 1];
+		arr[i + 1] = tmp;
+	}
+	bubble_sort(arr, size, i + 1);
+}
+
+void	sort_env(t_env *env, int count, int i)
+{
+	if (i == count - 1)
+		return;
+	bubble_sort(env->env_cpy, count, 0);
+	sort_env(env, count - 1, i + 1);
+}
+
+void	print_special_export(t_env *env, int count, int i)
+{
+	if (i < count)
+	{
+		printf("declare -x %s\n", env->env_cpy[i]);
+		print_special_export(env, count, i + 1);
+	}
+}
+
+void	special_export(t_env *env)
+{
+	int i = 0;
+
+	while (env->env_cpy[i] != NULL)
+	{
+		printf("declare -x %s\n", env->env_cpy[i]);
+		i++;
+	}
+	sort_env(env, i, 0);
+}
+
+void	normal_export(char *cmd, t_env *env)
+{
+	int i = 0;
+	
+	while (env->env_cpy[i] != NULL)
+		i++;
+	env->env_cpy[i] = strdup(cmd);
+}
+
+void	ft_export(t_env *env, char **cmd)
+{
+	if (!cmd[1])
+		special_export(env);
+	else
+	{
+		int i = 1;
+		while (cmd[i] != NULL)
+		{
+			if (var_exist(cmd[i], env) == TRUE)
+				replace_value(cmd[i], env);
+			else
+				normal_export(cmd[i], env);
+			i++;
+		}
+	}
 }
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
@@ -1055,29 +1089,6 @@ char	**ft_split(char const *s, char c)
 
 void	is_command(char *input, int error, t_env *env)
 {
-	/*if (error)
-		return;
-	if (strcmp(input, "pwd") == 0)
-	{
-		pwd();
-		printf("Comando ejecutado perrooooooo😎\n");
-	}
-	char **args;
-	args = ft_split(input, ' ');
-	if (args[0] != NULL)
-	{
-		if (strcmp(args[0], "echo") == 0)
-		{
-			const char **const_args = (const char **)args;
-            echo(const_args);
-			printf("Uyyyy papi comando ejecutado 🥵\n");
-		}
-		else if (strcmp(args[0], "export") == 0)
-		{
-			export_command(ft_env, *args);
-			printf("Uyyy perro ese export se ejecuto bien 🤑\n");
-		}
-	}*/
 	if (error)
 		return ;
 
@@ -1092,7 +1103,7 @@ void	is_command(char *input, int error, t_env *env)
 		args = ft_split(input, ' ');
 		if (args[0] != NULL)
 		{
-			if (strcmp(args[0], "echo") == 0) //es un int
+			if (strcmp(args[0], "echo") == 0) // ya es un int
 			{
 				const char **const_args = (const char **)args;
             	echo(const_args);
@@ -1102,11 +1113,9 @@ void	is_command(char *input, int error, t_env *env)
 			{
 				if (args[1] != NULL)
 				{
-					export_command(env, args[1]);
+					ft_export(env, &args[1]);
 					printf("Uyyy perro ese export funciona 🤑\n");
 				}
-				else
-					printf("Error papu: el export esta solo 😤\n");
 			}
 			else if (strcmp(args[0], "env") == 0)
 			{

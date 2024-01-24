@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/23 22:05:15 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/24 21:01:30 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -877,6 +877,26 @@ void	ft_env(char *input, t_env *count)
 	}
 }
 
+void	hola(char **env, t_env *env_hola)
+{
+	int i = 0;
+	int j = 0;
+
+	while (env[i] != NULL)
+		i++;
+	env_hola->env_cpy = calloc(sizeof(char *), i + 1);
+	if (!env_hola->env_cpy)
+		exit(1);
+	while (j < i)
+	{
+		//printf("\033[1;31mhola while : j %d env |%s|\n\033[0m", j, env[j]);
+		env_hola->env_cpy[j] = strdup(env[j]);
+		//printf("hola while : j %d |%s|\n", j, env_hola->env_cpy[j]);
+		j++;
+	}
+	env_hola->env_cpy[j] = NULL;
+}
+
 int	mod_strcmp(char *cmd, char *env)
 {
 	int	i = 0;
@@ -896,7 +916,7 @@ int	mod_strcmp(char *cmd, char *env)
 
 void	bubble_sort(char **arr, int size, int i);
 void	normal_export(char *cmd, t_env *env);
-void	sort_env(t_env *env, int count, int i);
+//void	sort_env(t_env *env, int count, int i);
 
 void	replace_value(char *cmd, t_env *env)
 {
@@ -908,14 +928,14 @@ void	replace_value(char *cmd, t_env *env)
 		{
 			free(env->env_cpy[i]);
 			env->env_cpy[i] = strdup(cmd);
-			sort_env(env, i + 1, 0);
+			//sort_env(env, i + 1, 0);
 			return;
 		}
 		i++;
 	}
 	//bubble_sort(env->env_cpy, i + 1, 0);
 	normal_export(cmd, env);
-	sort_env(env, i + 1, 0);
+	//sort_env(env, i + 1, 0);
 }
 
 int	var_exist(char *cmd, t_env *env)
@@ -944,13 +964,13 @@ void	bubble_sort(char **arr, int size, int i)
 	bubble_sort(arr, size, i + 1);
 }
 
-void	sort_env(t_env *env, int count, int i)
+/*void	sort_env(t_env *env, int count, int i)
 {
 	if (i == count - 1)
 		return;
 	bubble_sort(env->env_cpy, count, 0);
 	sort_env(env, count - 1, i + 1);
-}
+}*/
 
 void	print_special_export(t_env *env, int count, int i)
 {
@@ -970,25 +990,42 @@ void	special_export(t_env *env)
 		printf("declare -x %s\n", env->env_cpy[i]);
 		i++;
 	}
-	sort_env(env, i, 0);
+	//sort_env(env, i, 0);
 }
 
 void	normal_export(char *cmd, t_env *env)
 {
 	int i = 0;
+	char **nuria;
 	
+	nuria = env->env_cpy;
 	while (env->env_cpy[i] != NULL)
 		i++;
-	env->env_cpy[i] = strdup(cmd);
+	env->env_cpy = calloc(sizeof(char *), i + 2);
+	int j = 0;
+	while (j < i)
+	{
+		env->env_cpy[j] = strdup(nuria[j]);
+		free(nuria[j]);
+		printf("normal: |%s|\n", env->env_cpy[j]);
+		j++;
+	}
+	printf("i: %d\tj: %d\n", i, j);
+	env->env_cpy[j++] = strdup(cmd);
+	env->env_cpy[j] = NULL;
+	free(nuria);
+		printf("normal: |%s|\n", env->env_cpy[j]);
+	//env->env_cpy[i] = strdup(cmd);
+	//printf("normal_export %d\t%s\n", i, env->env_cpy[i]);
 }
 
 void	ft_export(t_env *env, char **cmd)
 {
-	if (!cmd[1])
+	int i = 0;
+	if (cmd[0] == NULL)
 		special_export(env);
 	else
 	{
-		int i = 1;
 		while (cmd[i] != NULL)
 		{
 			if (var_exist(cmd[i], env) == TRUE)
@@ -999,7 +1036,6 @@ void	ft_export(t_env *env, char **cmd)
 		}
 	}
 }
-
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
     size_t s_len = strlen(s);
@@ -1111,11 +1147,8 @@ void	is_command(char *input, int error, t_env *env)
 			}
 			else if (strcmp(args[0], "export") == 0)
 			{
-				if (args[1] != NULL)
-				{
-					ft_export(env, &args[1]);
-					printf("Uyyy perro ese export funciona 🤑\n");
-				}
+				ft_export(env, &args[1]);
+				printf("Uyyy perro ese export funciona 🤑\n");
 			}
 			else if (strcmp(args[0], "env") == 0)
 			{
@@ -1141,9 +1174,14 @@ int	main(int argc, char **argv, char **env)
 	char		*input;
 	int			err;
 	t_env		my_env;
-	my_env.env_cpy = env;
-
 	
+	hola(env, &my_env);	
+	/*for (int i = 0; my_env.env_cpy[i]; i++)
+	{
+		printf("main: |%s|\n", my_env.env_cpy[i]);
+		free(my_env.env_cpy[i]);
+	}
+	free(my_env.env_cpy);*/
 	initialize_operator_types();
 	//signals();
 	while (1)

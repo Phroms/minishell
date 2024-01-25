@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/25 20:36:55 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/25 20:58:45 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1038,10 +1038,17 @@ void	ft_export(t_env *env, char **cmd)
 	{
 		while (cmd[i] != NULL)
 		{
-			if (var_exist(cmd[i], env) == TRUE)
-				replace_value(cmd[i], env);
+			if (strcmp(cmd[i], "0") == 0)
+			{
+				printf("bash: export: `%s': not a valid identifier\n", cmd[i]);
+			}
 			else
-				normal_export(cmd[i], env);
+			{
+				if (var_exist(cmd[i], env) == TRUE)
+					replace_value(cmd[i], env);
+				else
+					normal_export(cmd[i], env);
+			}
 			i++;
 		}
 	}

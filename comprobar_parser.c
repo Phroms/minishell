@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/24 21:01:30 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/25 20:36:55 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -987,7 +987,17 @@ void	special_export(t_env *env)
 
 	while (env->env_cpy[i] != NULL)
 	{
-		printf("declare -x %s\n", env->env_cpy[i]);
+		char *equal_sign = strchr(env->env_cpy[i], '=');
+		if (equal_sign != NULL)
+        {
+			*equal_sign = '\0';
+            printf("declare -x %s=\"%s\"\n", env->env_cpy[i], equal_sign + 1);
+            *equal_sign = '=';
+		}
+		else
+		{
+			 printf("declare -x %s\n", env->env_cpy[i]);
+		}
 		i++;
 	}
 	//sort_env(env, i, 0);
@@ -1007,14 +1017,14 @@ void	normal_export(char *cmd, t_env *env)
 	{
 		env->env_cpy[j] = strdup(nuria[j]);
 		free(nuria[j]);
-		printf("normal: |%s|\n", env->env_cpy[j]);
+		//printf("normal: |%s|\n", env->env_cpy[j]);
 		j++;
 	}
-	printf("i: %d\tj: %d\n", i, j);
+	//printf("i: %d\tj: %d\n", i, j);
 	env->env_cpy[j++] = strdup(cmd);
 	env->env_cpy[j] = NULL;
 	free(nuria);
-		printf("normal: |%s|\n", env->env_cpy[j]);
+		//printf("normal: |%s|\n", env->env_cpy[j]);
 	//env->env_cpy[i] = strdup(cmd);
 	//printf("normal_export %d\t%s\n", i, env->env_cpy[i]);
 }
@@ -1036,6 +1046,27 @@ void	ft_export(t_env *env, char **cmd)
 		}
 	}
 }
+
+void	ft_unset(char *variable, t_env *env)
+{
+	int i = 0;
+	char **env_ptr = env->env_cpy;
+
+	while (env_ptr[i] != NULL)
+	{
+		if (strncmp(env_ptr[i], variable, strlen(variable)) == 0)
+		{
+			while (env_ptr[i] != NULL)
+			{
+				env_ptr[i] = env_ptr[i + 1];
+				i++;
+			}
+			return;
+		}
+		i++;
+	}
+}
+
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
     size_t s_len = strlen(s);
@@ -1154,6 +1185,16 @@ void	is_command(char *input, int error, t_env *env)
 			{
 				ft_env(input, env);
 				printf("Uyyy ese env funca ehh 😈\n");
+			}
+			else if (strcmp(args[0], "unset") == 0)
+			{
+				if (args[1] != NULL)
+				{
+					ft_unset(args[1], env);
+					printf("Uyyy ese unset esta hot hot 😳\n");
+				}
+				else
+					printf("Oe payaso no hay nada despues del unset 🤡\n");
 			}
 			char	**arg_ptr = args;
 			while (*arg_ptr != NULL)

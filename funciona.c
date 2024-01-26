@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/25 20:58:45 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/26 20:15:39 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -863,18 +863,18 @@ int	ft_strcmp(char *s1, char *s2)
 #define TRUE 1
 #define FALSE 0
 
-void	ft_env(char *input, t_env *count)
+void	ft_env(t_env *count)
 {
 	int i = 0;
 	
-	if (ft_strcmp(input, "env") == 0)
-	{
-		while (count->env_cpy[i])
+	//if (ft_strcmp(input, "env") == 0)
+	//{
+		while (count->env_cpy[i] != NULL)
 		{
 			printf("%s\n", count->env_cpy[i]);
 			i++;
 		}
-	}
+	//}
 }
 
 void	hola(char **env, t_env *env_hola)
@@ -1163,10 +1163,13 @@ char	**ft_split(char const *s, char c)
 
 void	is_command(char *input, int error, t_env *env)
 {
+	char **args;
+		args = ft_split(input, ' ');
+
 	if (error)
 		return ;
 
-	if (strcmp(input, "pwd") == 0)
+	if (strcmp(args[0], "pwd") == 0)
 	{
 		pwd();
 		printf("Comando ejecutado perrooooooooo 😎\n");
@@ -1190,7 +1193,7 @@ void	is_command(char *input, int error, t_env *env)
 			}
 			else if (strcmp(args[0], "env") == 0)
 			{
-				ft_env(input, env);
+				ft_env(env);
 				printf("Uyyy ese env funca ehh 😈\n");
 			}
 			else if (strcmp(args[0], "unset") == 0)

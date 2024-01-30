@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/26 20:15:39 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/30 21:47:47 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,26 +67,6 @@ int matrixify(t_tokens *tokens);
 int	add_history(const char *str);
 t_word *create_word(char *str, size_t len, int type);
 
-//  PROCESOS Y DEFINICION DE LOS TIPOS DE COSAS QUE LE ENVIO
-
-#define ARGUMENTS 0		// Palabra o argumentos normal
-#define PIPE 1			// Operador o tuberia (|)
-#define REDIRECT_IN 2 	// Operador de redireccion de entrad (<)
-#define REDIRECT_OUT 3	// Operador de redireccion de salida (>)
-#define APPEND 4		// Operador de redireccion de salida en concatenacion (>>)
-#define DOUBLE_INT 5	// Operador de redireccion de entrada doble (<<)
-
-int operator_types[256] = {0};
-
-void initialize_operator_types()
-{
-    operator_types['|'] = PIPE;
-    operator_types['>'] = REDIRECT_OUT;
-    operator_types['<'] = REDIRECT_IN;
-    operator_types['2'] = APPEND;  // '2' representa ">>"
-	operator_types['3'] = DOUBLE_INT;
-}
-
 int	is_rd(int c)
 {
 	if (c == '<' || c == '>')
@@ -104,6 +84,8 @@ int is_redirection(char *str, int i)
 		return (1);
 	if (str[i] == '<' && str[i - 1] == '>')
 		return (1);
+	if (str[i] == '>' && str[i - 1] == '>')
+		return (1);
 	return (0);
 }
 
@@ -118,29 +100,50 @@ int	check_rd(char *str, int i)
 	return (0);
 }
 
-int	check_input(char *str)
+int is_double_redirect(char *str, int i)
 {
-	while (*str)
+    if (str[i] == '>' && str[i + 1] == '>')
+        return 1;
+    return 0;
+}
+
+int check_input(char *str, t_tokens *tokens)
+{
+    int inside_double_redirect = 0;
+    
+    while (*str)
     {
         if ((*str == '>' || *str == '<' || *str == '|') &&
             (str[1] == '>' || str[1] == '<' || str[1] == '|' || str[1] == '\0'))
         {
-            printf("syntax error near unexpected token '%c%c'\n", *str, str[1]);
-            return 1;
+            if (is_double_redirect(str, 0) && (str[2] == '\0' || str[2] == ' '))
+            {
+                if (inside_double_redirect)
+                {
+                    printf("syntax error near unexpected token '%c%c%c'\n", *str, str[1], str[2]);
+                    return 1;
+                }
+                else
+                {
+                    printf("Found '>>' redirection\n");
+                    inside_double_redirect = 1;
+                    add_words(tokens, ">>", 2, 4);  // Agregamos '>>' como un solo token
+                    str += 2;
+                }
+            }
+            else
+            {
+                printf("syntax error near unexpected token '%c%c'\n", *str, str[1]);
+                return 1;
+            }
         }
-        else if (*str == '|' && (str[1] == '|' || str[1] == '>' || str[1] == '<'))
+        else
         {
-            printf("syntax error near unexpected token '%c%c'\n", *str, str[1]);
-            return 1;
+            inside_double_redirect = 0;
+            str++;
         }
-        else if ((*str == '>' || *str == '<' || *str == '|') && str[1] == '\0')
-        {
-            printf("syntax error near unexpected token '%c'\n", *str);
-            return 1;
-        }
-
-        str++;
     }
+
     if (*(str - 1) == '\n')
     {
         printf("syntax error near unexpected token `newline'\n");
@@ -164,18 +167,28 @@ int	is_normal_ch(char ch)
 	return (0);
 }
 
-int	string_tokens(t_tokens *tokens, char *str)
+int string_tokens(t_tokens *tokens, char *str)
 {
-	int	i;
-	int	command_found;
+    int i;
+    int command_found;
 
-	i = 0;
-	command_found = 0;
-	while (str[i] && !is_normal_ch(str[i]))
-		i++;
-	if (!command_found)
-		add_words(tokens, str, i, 0);
-	return (i);
+    i = 0;
+    command_found = 0;
+    while (str[i] && !is_normal_ch(str[i]))
+        i++;
+
+    if (!command_found)
+    {
+        if (i >= 2 && str[0] == '$' && str[1] == '?' && is_normal_ch(str[i]))
+        {
+            add_words(tokens, str, i, 0);
+        }
+        else
+        {
+            add_words(tokens, str, i, 0);
+        }
+    }
+    return i;
 }
 
 int	parse_string(t_tokens *tokens, char *str)
@@ -192,7 +205,9 @@ int	parse_string(t_tokens *tokens, char *str)
 		else if (str[i] == '"' || str[i] == '\'')
 			i += is_marks(tokens, str + i);
 		else if (str[i] == ' ')
-			i += is_space(tokens, str + i);
+			i += is_space(tokens, str + i);  
+  		else if (is_redirection(str, i))
+            i += break_token(tokens, str + i);
 		else
 			i += string_tokens(tokens, str + i);
 		if (tokens->error == 1)
@@ -204,26 +219,6 @@ int	parse_string(t_tokens *tokens, char *str)
 
 int	parser(t_tokens **tokens, char *str, char **env)
 {
-	/*if (!*tokens)
-	{
-		*tokens = init_token(env);
-		if (!*tokens)
-		{
-			printf("Error: oe tu token no funciona\n");
-			return (1);
-		}
-	}
-	(*tokens)->env = env;
-	(*tokens)->error = 0;
-	if (check_input(str))
-		return (42);
-	parse_string(*tokens, str);
-	if ((*tokens)->error == 0)
-	{
-		matrixify(*tokens);
-		add_history(str);
-	}
-	return ((*tokens)->error);*/
 	if (!*tokens)
 	{
 		*tokens = init_token(env);
@@ -235,7 +230,7 @@ int	parser(t_tokens **tokens, char *str, char **env)
 	}
 	(*tokens)->env = env;
 	(*tokens)->error = 0;
-	if (check_input(str))
+	if (check_input(str, *tokens))
 		return (42);
 	parse_string(*tokens, str);
 	matrixify(*tokens);
@@ -287,31 +282,11 @@ int	is_marks(t_tokens *tokens, char *str)
 		return (len);
 	if (str[0] == '"')
 		add_words(tokens, str + 1, len, 2);
-	else if (str[0] == '\'') //despues prueba poniendo esto como if
+	else if (str[0] == '\'')
 		add_words(tokens, str + 1, len, 1);
 	else
 		add_words(tokens, str, len, 0);
 	return (len + 2);
-	/*int len = dst_dots(str, str[0]);
-    if (len == -1 || len == -2)
-    {
-        tokens->error = 1;
-        return 1;
-    }
-    if (len == 0)
-        return len;
-
-    // Eliminar comillas dobles o simples alrededor de la palabra
-    if (len >= 2 && (str[0] == '"' || str[0] == '\'') && str[0] == str[len - 1])
-    {
-        add_words(tokens, str + 1, len - 2, 0);
-    }
-    else
-    {
-        add_words(tokens, str, len, 0);
-    }
-
-    return len + 2;*/
 }
 
 int	is_space(t_tokens *tokens, char *str)
@@ -375,33 +350,11 @@ char	*ft_strdup(const char *s)
 
 int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 {
-	/*if (type == 2 || type == 1)
-    {
-		if (len >= 2 && (str[0] == '"' || str[0] == '\'') && str[0] == str[len - 1])
-		{
-			str++;
-			len -= 2;
-		}
-    }
-    t_word *new_word = create_word(str, len, type);
-    if (!new_word)
-        return 0;
-
-    tokens->size += 1;
-    t_word *new_array = realloc(tokens->words, tokens->size * sizeof(t_word));
-    if (!new_array)
-    {
-        free(new_word->word);
-        free(new_word);
-        return 0;
-    }
-    new_array[tokens->size - 1] = *new_word;
-    tokens->words = new_array;
-    free(new_word);
-    return 1;*/
 	t_word *new_word = create_word(str, len, type);
     if (!new_word)
 		return 0;
+	if (type == 4 && len > 1)
+		new_word->type = 5;
 	tokens->size += 1;
     t_word *new_array = calloc(tokens->size, sizeof(t_word));
     if (!new_array)
@@ -415,59 +368,15 @@ int	add_words(t_tokens *tokens, char *str, size_t len, int type)
         memcpy(new_array, tokens->words, (tokens->size - 1) * sizeof(t_word));
 		free(tokens->words);
 	}
+    if (tokens->size > 2 &&
+        new_array[tokens->size - 3].type == 3 &&
+        new_array[tokens->size - 2].type == 3 &&
+        new_word->type == 4)
+		tokens->size -= 2;
 	new_array[tokens->size - 1] = *new_word;
-	//free(tokens->words);
 	tokens->words = new_array;
-	//free(new_word->word);
 	free(new_word);
 	return (1);
-    /*if (type == ARGUMENTS)
-    {
-        // Ajustar la lógica para reconocer correctamente ">>" como APPEND
-        if (len >= 2 && str[0] == '>' && str[1] == '>')
-        {
-            type = APPEND;
-            len = 2; // Ajustar la longitud para ">>"
-        }
-        else
-        {
-            type = operator_types[(unsigned char)str[0]];
-        }
-    }
-
-    // Copiar la cadena y eliminar comillas si existen alrededor
-    char *word_copy = ft_strdup(str);
-    if (!word_copy)
-        return 0;
-	t_word *new_word = create_word(word_copy, strlen(word_copy), type);
-    free(word_copy); // Liberar la copia después de usarla
-    if (!new_word)
-        return 0;
-
-    size_t new_size = tokens->size + 1;
-
-    t_word *new_array = (t_word *)malloc(new_size * sizeof(t_word));
-	if (!new_array)
-    {
-        free(new_word->word);
-        free(new_word);
-        return 0;
-    }
-	memcpy(new_array, tokens->words, tokens->size * sizeof(t_word));
-
-    // Agregar la nueva palabra al final del nuevo array
-    new_array[tokens->size] = *new_word;
-
-    // Liberar el antiguo array y actualizar la referencia
-    free(tokens->words);
-    tokens->words = new_array;
-    tokens->size = new_size;
-    free(new_word);*/
-    //tokens->words = new_array;
-    //tokens->words[tokens->size] = *new_word;
-    //tokens->size = new_size;
-    //free(new_word);
-    //return 1;
 }
 
 char	*ft_substr(char const *s, unsigned int start, size_t len);
@@ -493,18 +402,6 @@ t_word *create_word(char *str, size_t len, int type)
        word->word[len] = str[len];
 	}
     return (word);
-   /*t_word *word = malloc(sizeof(t_word));
-    if (!word)
-        return NULL;
-	word->word = strdup(str);
-    if (!word->word) {
-        free(word);
-        return NULL;
-    }
-
-    word->len = len;
-    word->type = type;
-    return word;*/
 }
 int	matrixify(t_tokens *tokens)
 {
@@ -525,8 +422,6 @@ int	matrixify(t_tokens *tokens)
 		tokens->env[i] = ft_strdup(word[i].word);
 		if (!tokens->env[i])
 			return 0;
-		/*memcpy(tokens->env[i]->env_cpy, word[i].word, word[i].len);
-		tokens->env[i]->env_cpy[word[i].len] = '\0';*/
 		i++;
 	}
 	return (1);
@@ -543,21 +438,6 @@ void	free_tokens(t_tokens *tokens)
 
 void	print_wrd_format(char *format_str, t_word word)
 {
-	/*if (!format_str)
-    {
-		printf("{%d}:", word.type);
-		if (word.type == 1 || word.type == 2)
-			printf(" >>%s<<\n", word.word);
-		else
-			printf(" %s\n", word.word);
-    }
-    else
-    {
-        if (word.type == 1 || word.type == 2)
-            printf(format_str, word.word);
-        else
-            printf(format_str, word.word);
-    }*/
 	if (!format_str)
 		printf("{%d}%s<", word.type, word.word);
 	else
@@ -618,9 +498,24 @@ void	print_pcs(t_pcs *pcs)
 	print_pcs_recur(pcs, 0);
 }
 
-void	print_pcs_types(t_tokens *tokens, int operator_types[])
+void	print_pcs_types(t_tokens *tokens)
 {
-	if (!tokens || !tokens->words)
+    if (!tokens || !tokens->words)
+    {
+        printf("No hay tipos asociados a pcs. gil:\n");
+        return;
+    }
+
+    printf("Aqui si hay tipos asociados a pcs wapo:\n");
+    size_t i = 0;
+    while (i < tokens->size)
+    {
+        printf("Tipo: %d\n", tokens->words[i].type);
+        i++;
+    }
+    printf("\n");
+
+	/*if (!tokens || !tokens->words)
 	{
 		printf("No hay tipos asociados a pcs. gil:\n");
 		return ;
@@ -632,38 +527,8 @@ void	print_pcs_types(t_tokens *tokens, int operator_types[])
 		printf("%d ", operator_types[(unsigned char)tokens->words[i].word[0]]);
 		i++;
 	}
-	printf("\n");
+	printf("\n");*/
 }
-
-/*void	signal_ctrl_c(int sig)
-{
-	if (sig == SIGINT) //esto le indica que interrumpe el programa;
-	{
-		printf("\n");
-		rl_on_new_line(); // esto indica que el cursor debe moverse a una nueva linea;
-		rl_replace_line("", 0); // reemplaza el antiguo texto con uno nuevo
-		rl_redisplay(); // muestra lo escrito por la funcion anterior.
-	}
-}
-
-void	signals(void)
-{
-	rl_catch_signals = 0;
-	signal(SIGQUIT, SIG_IGN); //esta linea maravillosa hace que le meta un null al readline y al hacer un ctrl-D, le mete ese null dentro del readline y hace un exit(1);
-	signal(SIGINT, signal_ctrl_c);
-}*/
-
-/*void	pwd(void)
-{
-	char	*pwd;
-
-	pwd = getcwd(NULL, 0);
-	if (pwd != NULL)
-	{
-		printf("%s\n", pwd);
-		free(pwd);
-	}
-}*/
 
 int pwd(void)
 {
@@ -680,94 +545,10 @@ int pwd(void)
         return 1;  // Error
     }
 }
-	/*		COMIENZO DEL EXIT		*/
-
-// al hacer '$?' despues de un exit significa que te dara un valor es decir:
-// dara 0: en caso de exito, que indica que el comando se ejecuto sin errores.
-// ejemplo:
-// 			echo "hola como estan?"
-// 			hola como estan
-// 			echo $?
-// 			0
-// dara 1-125: significa que dio errores generales o condiciones de salida anormales.
-// ejemplo:
-// 			ls archivo_inexistente
-// 			ls: archivo_inexistente: No such file or directory
-// 			echo $?
-// 			1
-// dara 126: significa que no se puede ejecutar el comando. Puede deberse a permisos insuficientes, el comando no encontrado, etc.
-// ejemplo:
-// 			./mi_script.sh
-//			bash: ./mi_script.sh: Permission denied
-//			echo $?
-//			126
-// dara 127: cuando el comando no pude ser encontrado.
-// ejemplo:
-// 			horse
-// 			bash: horse: command not found
-// 			echo $?
-// 			127
-
-	/*		OTROS EJEMPLOS		*/
-
-// EL NOMBRE DE "$?" ES "STATUS VARIABLE" o "VARIABLE DE ESTADO"
-// "STATUS VARIABLE" ➜ Es una variable especial que almacena el código de salida del último comando ejecutado en la terminal.
-//bash-3.2$: exit 123 (LO QUE LE ENVIAMOS)
-//exit (RESULTADO)
-//➜  Desktop echo $? (STATUS VARIABLE ➜ "$?")
-//123 (EL RESULTADO QUE DA) (AUN FALTA COMPRENDER)
-//
-//bash-3.2$: exit 123 456 (LO QUE LE ENVIAMOS)
-//exit (RESULTADO)
-//bash: exit: too many arguments (RESULTADO DE BASH)
-//bash-3.2$ echo $? (STATUS VARIABLE ➜ "$?")
-//1 (AQUI SE CUMPLE EL ERROR DE 1-125)
-
-/*int	echo(char **args)
-{
-	bool	print_line;
-
-	print_line = true;
-	if (strncmp(*args, "echo", strlen(*args)) != 0)
-		return (EXIT_FAILURE);
-	args++;
-	if (*args && strncmp(*args, "-n", strlen("-n") + 1) == 0)
-	{
-		print_line = false;
-		args++;
-	}
-	while (*args != NULL)
-	{
-		printf("%s", *args);
-		args++;
-		if (*args != NULL)
-			printf(" ");
-	}
-	if (print_line)
-		printf("\n");
-	return (EXIT_SUCCESS);
-}*/
-/*static int	ft_count_char(const char *str, char c)
-{
-	int i;
-	int count;
-
-	i = 0;
-	count = 0;
-	while(str[i])
-	{
-		if (str[i] == c)
-			count++;
-		i++;
-	}
-	return (count);
-}*/
-
 int echo(const char **args)
 {
 	    bool print_line = true;
-    args++; // Avanzar al primer argumento después de "echo"
-
+    args++;
     if (*args && strncmp(*args, "-n", strlen("-n") + 1) == 0)
     {
         print_line = false;
@@ -781,24 +562,18 @@ int echo(const char **args)
 
         if (arg_len >= 2 && ((arg[0] == '"' && arg[arg_len - 1] == '"') || (arg[0] == '\'' && arg[arg_len - 1] == '\'')))
         {
-            // Si la cadena comienza y termina con comillas simples o dobles, imprímela sin las comillas
             printf("%.*s", (int)arg_len - 2, arg + 1);
         }
         else
         {
-            // Si no, imprimir la cadena normalmente
-            // Eliminar comillas dentro de la cadena
             const char *quote = strpbrk(arg, "\"\'");
             while (quote != NULL)
             {
                 size_t chunk_len = quote - arg;
                 printf("%.*s", (int)chunk_len, arg);
-
-                arg = quote + 1; // Saltar la comilla encontrada
-                quote = strpbrk(arg, "\"\'");
+                arg = quote + 1; 
+				quote = strpbrk(arg, "\"\'");
             }
-
-            // Imprimir el resto de la cadena
             printf("%s", arg);
         }
 
@@ -811,43 +586,7 @@ int echo(const char **args)
     if (print_line)
         printf("\n");
 
-    return 0; // Éxito
-	/*bool print_line = true;
-    args++;
-
-    if (*args && strcmp(*args, "-n") == 0)
-    {
-        print_line = false;
-        args++;
-    }
-
-    while (*args != NULL)
-    {
-        // Manejo de comillas
-        const char *arg = *args;
-        size_t arg_len = strlen(arg);
-
-        if (arg_len >= 2 && ((arg[0] == '"' && arg[arg_len - 1] == '"') || (arg[0] == '\'' && arg[arg_len - 1] == '\'')))
-        {
-            // Si la cadena comienza y termina con comillas simples o dobles, imprímela sin las comillas
-            printf("%.*s", (int)arg_len - 2, arg + 1);
-        }
-        else
-        {
-            // Si no, imprime la cadena normalmente
-            printf("%s", arg);
-        }
-
-        args++;
-
-        if (*args != NULL)
-            printf(" ");
-    }
-
-    if (print_line)
-        printf("\n");
-
-    return EXIT_SUCCESS;*/
+    return 0;
 }
 
 int	ft_strcmp(char *s1, char *s2)
@@ -867,14 +606,11 @@ void	ft_env(t_env *count)
 {
 	int i = 0;
 	
-	//if (ft_strcmp(input, "env") == 0)
-	//{
-		while (count->env_cpy[i] != NULL)
+	while (count->env_cpy[i] != NULL)
 		{
 			printf("%s\n", count->env_cpy[i]);
 			i++;
 		}
-	//}
 }
 
 void	hola(char **env, t_env *env_hola)
@@ -889,9 +625,7 @@ void	hola(char **env, t_env *env_hola)
 		exit(1);
 	while (j < i)
 	{
-		//printf("\033[1;31mhola while : j %d env |%s|\n\033[0m", j, env[j]);
 		env_hola->env_cpy[j] = strdup(env[j]);
-		//printf("hola while : j %d |%s|\n", j, env_hola->env_cpy[j]);
 		j++;
 	}
 	env_hola->env_cpy[j] = NULL;
@@ -916,7 +650,6 @@ int	mod_strcmp(char *cmd, char *env)
 
 void	bubble_sort(char **arr, int size, int i);
 void	normal_export(char *cmd, t_env *env);
-//void	sort_env(t_env *env, int count, int i);
 
 void	replace_value(char *cmd, t_env *env)
 {
@@ -928,14 +661,11 @@ void	replace_value(char *cmd, t_env *env)
 		{
 			free(env->env_cpy[i]);
 			env->env_cpy[i] = strdup(cmd);
-			//sort_env(env, i + 1, 0);
 			return;
 		}
 		i++;
 	}
-	//bubble_sort(env->env_cpy, i + 1, 0);
 	normal_export(cmd, env);
-	//sort_env(env, i + 1, 0);
 }
 
 int	var_exist(char *cmd, t_env *env)
@@ -963,14 +693,6 @@ void	bubble_sort(char **arr, int size, int i)
 	}
 	bubble_sort(arr, size, i + 1);
 }
-
-/*void	sort_env(t_env *env, int count, int i)
-{
-	if (i == count - 1)
-		return;
-	bubble_sort(env->env_cpy, count, 0);
-	sort_env(env, count - 1, i + 1);
-}*/
 
 void	print_special_export(t_env *env, int count, int i)
 {
@@ -1000,7 +722,6 @@ void	special_export(t_env *env)
 		}
 		i++;
 	}
-	//sort_env(env, i, 0);
 }
 
 void	normal_export(char *cmd, t_env *env)
@@ -1017,16 +738,11 @@ void	normal_export(char *cmd, t_env *env)
 	{
 		env->env_cpy[j] = strdup(nuria[j]);
 		free(nuria[j]);
-		//printf("normal: |%s|\n", env->env_cpy[j]);
 		j++;
 	}
-	//printf("i: %d\tj: %d\n", i, j);
 	env->env_cpy[j++] = strdup(cmd);
 	env->env_cpy[j] = NULL;
 	free(nuria);
-		//printf("normal: |%s|\n", env->env_cpy[j]);
-	//env->env_cpy[i] = strdup(cmd);
-	//printf("normal_export %d\t%s\n", i, env->env_cpy[i]);
 }
 
 void	ft_export(t_env *env, char **cmd)
@@ -1153,13 +869,6 @@ char	**ft_split(char const *s, char c)
 	arr[i] = NULL;
 	return (arr);
 }
-//funcion que vera si hara comandos
-
-/*void	exit_cmd(void)
-{
-	printf("No te vayas quedate, conmigo... 😞\n");
-	exit(0);
-}*/
 
 void	is_command(char *input, int error, t_env *env)
 {
@@ -1216,52 +925,13 @@ void	is_command(char *input, int error, t_env *env)
 		}
 	}
 }
-// NO ELIMINAR ESTE MAIN ꜜ
-int	main(int argc, char **argv, char **env)
-{
-	(void)argc;
-	(void)argv;
-	t_tokens	*tokens = NULL;
-	char		*input;
-	int			err;
-	t_env		my_env;
-	
-	hola(env, &my_env);	
-	/*for (int i = 0; my_env.env_cpy[i]; i++)
-	{
-		printf("main: |%s|\n", my_env.env_cpy[i]);
-		free(my_env.env_cpy[i]);
-	}
-	free(my_env.env_cpy);*/
-	initialize_operator_types();
-	//signals();
-	while (1)
-	{
-		input = readline("> ");
-		if (!input)
-			exit(0);
-		
-		err = parser(&tokens, input, env);
-		if (tokens != NULL)
-		{
-			is_command(input, err, &my_env);
-			//free_tokens(tokens); este free_tokens no porque ya liberamos en el parser;
-			// igualamos tokens a NULL;
-		}
-		// hacer una o mas funciones que haga los comandos(cmd);
-	}
-	//free_all();
-	return (0);
-}
 
-/*		MAIN PARA CONFIRMAR PARSER SI FUNCIONA CORRECTAMENTE	*/
-
-/*int main()
+int main()
 {
     char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
 
     // Inicializar el array de tipos de operadores
-    initialize_operator_types();
+    //initialize_operator_types();
 
     t_tokens *tokens = NULL;
     char input[256]; // Puedes ajustar el tamaño según tus necesidades
@@ -1281,7 +951,7 @@ int	main(int argc, char **argv, char **env)
         procesos.types = NULL;
         if (tokens && tokens->size > 0 && tokens->error == 0)
             procesos.types = &tokens->words[0].type;
-        print_pcs_types(procesos.argv, operator_types);
+        print_pcs_types(procesos.argv);
     }
     else
     {
@@ -1292,4 +962,4 @@ int	main(int argc, char **argv, char **env)
     free_tokens(tokens);
 
     return 0;
-}*/
+}

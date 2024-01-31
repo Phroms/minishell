@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/30 21:47:47 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/01/31 18:59:40 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,16 +67,16 @@ int matrixify(t_tokens *tokens);
 int	add_history(const char *str);
 t_word *create_word(char *str, size_t len, int type);
 
-int	is_rd(int c)
+static int	is_rd(char ch)
 {
-	if (c == '<' || c == '>')
+	if (ch == '<' || ch == '>')
 		return (1);
 	return (0);
 }
 
-int is_redirection(char *str, int i)
+static int	check_redirect_in(char *str, int i)
 {
-	if (str[i + 1] == '\0')
+	if (!str[i + 1])
 		return (1);
 	if (i < 2)
 		return (0);
@@ -84,78 +84,76 @@ int is_redirection(char *str, int i)
 		return (1);
 	if (str[i] == '<' && str[i - 1] == '>')
 		return (1);
-	if (str[i] == '>' && str[i - 1] == '>')
-		return (1);
 	return (0);
 }
 
-int	check_rd(char *str, int i)
+static int	check_pipe(char *str, int i)
 {
-	if (str[i] == '<' || str[i] == '>')
+	if (i == 0)
 		return (1);
-	if (str[i + 1] == '\0')
+	if (!str[i + 1])
 		return (1);
 	if (str[i - 1] == '<' || str[i - 1] == '>')
 		return (1);
 	return (0);
 }
 
-int is_double_redirect(char *str, int i)
+int	check_input(char *str)
 {
-    if (str[i] == '>' && str[i + 1] == '>')
-        return 1;
-    return 0;
-}
+    int i = 0;
+    int error = 0;
 
-int check_input(char *str, t_tokens *tokens)
-{
-    int inside_double_redirect = 0;
-    
-    while (*str)
+    while (str[i])
     {
-        if ((*str == '>' || *str == '<' || *str == '|') &&
-            (str[1] == '>' || str[1] == '<' || str[1] == '|' || str[1] == '\0'))
+        if (str[i] == '>')
         {
-            if (is_double_redirect(str, 0) && (str[2] == '\0' || str[2] == ' '))
+            if (check_redirect_in(str, i))
             {
-                if (inside_double_redirect)
-                {
-                    printf("syntax error near unexpected token '%c%c%c'\n", *str, str[1], str[2]);
-                    return 1;
-                }
-                else
-                {
-                    printf("Found '>>' redirection\n");
-                    inside_double_redirect = 1;
-                    add_words(tokens, ">>", 2, 4);  // Agregamos '>>' como un solo token
-                    str += 2;
-                }
+                error = printf("syntax error near unexpected token '>'\n");
             }
-            else
+            else if (str[i + 1] == '>' && str[i + 2] == '>')
             {
-                printf("syntax error near unexpected token '%c%c'\n", *str, str[1]);
-                return 1;
+                error = printf("syntax error near unexpected token '>>'\n");
             }
         }
-        else
+        else if (str[i] == '|')
         {
-            inside_double_redirect = 0;
-            str++;
+            if (check_pipe(str, i))
+            {
+                error = printf("syntax error near unexpected token '|'\n");
+            }
         }
-    }
+        else if (str[i] == '<')
+        {
+            if (check_redirect_in(str, i))
+            {
+                error = printf("syntax error near unexpected token '<'\n");
+            }
+            else if (str[i + 1] == '<' && str[i + 2] == '<')
+            {
+                error = printf("syntax error near unexpected token '<<'\n");
+            }
+        }
 
-    if (*(str - 1) == '\n')
-    {
-        printf("syntax error near unexpected token `newline'\n");
-        return 1;
+        if (error != 0)
+        {
+            return 1;
+        }
+
+        i++;
     }
 
     return 0;
 }
-
 int	break_token(t_tokens *tokens, char *str)
 {
-	add_words(tokens, str, 1, 3);
+	 //aqui el valor que le damos a las ">, <";
+	if (strncmp(str, ">>", 2) == 0 || strncmp(str, "<<", 2) == 0)
+	{
+        add_words(tokens, str, 2, 5); // Asignar el valor 5 para >> y 6 para <<
+        return 2; // Retornar la longitud del token procesado para avanzar en la cadena.
+    }
+add_words(tokens, str, 1, 3);
 	return (1);
 }
 
@@ -185,7 +183,7 @@ int string_tokens(t_tokens *tokens, char *str)
         }
         else
         {
-            add_words(tokens, str, i, 0);
+            add_words(tokens, str, i, 0); //aqui es el valor que le damos a las palabras
         }
     }
     return i;
@@ -206,8 +204,6 @@ int	parse_string(t_tokens *tokens, char *str)
 			i += is_marks(tokens, str + i);
 		else if (str[i] == ' ')
 			i += is_space(tokens, str + i);  
-  		else if (is_redirection(str, i))
-            i += break_token(tokens, str + i);
 		else
 			i += string_tokens(tokens, str + i);
 		if (tokens->error == 1)
@@ -230,7 +226,7 @@ int	parser(t_tokens **tokens, char *str, char **env)
 	}
 	(*tokens)->env = env;
 	(*tokens)->error = 0;
-	if (check_input(str, *tokens))
+	if (check_input(str))
 		return (42);
 	parse_string(*tokens, str);
 	matrixify(*tokens);
@@ -350,29 +346,25 @@ char	*ft_strdup(const char *s)
 
 int	add_words(t_tokens *tokens, char *str, size_t len, int type)
 {
-	t_word *new_word = create_word(str, len, type);
-    if (!new_word)
-		return 0;
-	if (type == 4 && len > 1)
-		new_word->type = 5;
+	t_word	*new_word;
+	t_word	*new_array;
+
+	new_word = create_word(str, len, type);
+	if (!new_word)
+		return (0);
 	tokens->size += 1;
-    t_word *new_array = calloc(tokens->size, sizeof(t_word));
-    if (!new_array)
+	new_array = calloc(tokens->size, sizeof(t_word));
+	if (!new_array)
 	{
-        free(new_word->word);
-        free(new_word);
-        return 0;
-    }
-    if (tokens->size > 1)
+		free(new_word->word);
+		free(new_word);
+		return (0);
+	}
+	if (tokens->size > 1)
 	{
-        memcpy(new_array, tokens->words, (tokens->size - 1) * sizeof(t_word));
+		memcpy(new_array, tokens->words, (tokens->size - 1) * sizeof(t_word));
 		free(tokens->words);
 	}
-    if (tokens->size > 2 &&
-        new_array[tokens->size - 3].type == 3 &&
-        new_array[tokens->size - 2].type == 3 &&
-        new_word->type == 4)
-		tokens->size -= 2;
 	new_array[tokens->size - 1] = *new_word;
 	tokens->words = new_array;
 	free(new_word);
@@ -405,23 +397,23 @@ t_word *create_word(char *str, size_t len, int type)
 }
 int	matrixify(t_tokens *tokens)
 {
-	t_word *word;
-	size_t i;
+	t_word	*word;
+	size_t	i;
 
 	word = tokens->words;
 	if (!word)
-		return 0;
-
+		return (0);
 	tokens->env = (char **)calloc(tokens->size + 1, sizeof(char *));
 	if (!tokens->env)
-		return 0;
-
+		return (0);
 	i = 0;
 	while (i < tokens->size)
 	{
 		tokens->env[i] = ft_strdup(word[i].word);
 		if (!tokens->env[i])
-			return 0;
+			return (0);
+		/*memcpy(tokens->env[i]->env_cpy, word[i].word, word[i].len);
+		tokens->env[i]->env_cpy[word[i].len] = '\0';*/
 		i++;
 	}
 	return (1);

@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/01/31 18:59:40 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/02/02 17:36:15 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,37 +67,38 @@ int matrixify(t_tokens *tokens);
 int	add_history(const char *str);
 t_word *create_word(char *str, size_t len, int type);
 
-static int	is_rd(char ch)
+int	is_rd(int c)
 {
-	if (ch == '<' || ch == '>')
+	if (c == '<' || c == '>')
 		return (1);
 	return (0);
 }
 
-static int	check_redirect_in(char *str, int i)
+int	is_redirection(char *str, int i)
 {
-	if (!str[i + 1])
-		return (1);
 	if (i < 2)
 		return (0);
-	if (is_rd(str[i - 1]) && is_rd(str[i - 2]) && is_rd(str[i]))
+    if (!str[i + 1])
+		return (1);
+    if (str[i] == '>' && str[i + 1] == '>' && str[i + 2] == '>')
+        return 1;
+	if (i >= 2 && is_rd(str[i - 1]) && is_rd(str[i - 2]) && is_rd(str[i]))
 		return (1);
 	if (str[i] == '<' && str[i - 1] == '>')
 		return (1);
 	return (0);
 }
 
-static int	check_pipe(char *str, int i)
+int	check_rd(char *str, int i)
 {
-	if (i == 0)
-		return (1);
-	if (!str[i + 1])
-		return (1);
-	if (str[i - 1] == '<' || str[i - 1] == '>')
-		return (1);
-	return (0);
+    if (i <= 0)
+        return (1);
+    if (!str[i + 1])
+        return (1);
+    if (str[i - 1] == '<' || str[i - 1] == '>')
+        return (1);
+    return (0);
 }
-
 int	check_input(char *str)
 {
     int i = 0;
@@ -107,43 +108,28 @@ int	check_input(char *str)
     {
         if (str[i] == '>')
         {
-            if (check_redirect_in(str, i))
-            {
-                error = printf("syntax error near unexpected token '>'\n");
-            }
+            if (is_redirection(str, i))
+                error = printf("syntax error near unexpected token `>'\n");
             else if (str[i + 1] == '>' && str[i + 2] == '>')
-            {
                 error = printf("syntax error near unexpected token '>>'\n");
-            }
         }
         else if (str[i] == '|')
         {
-            if (check_pipe(str, i))
-            {
-                error = printf("syntax error near unexpected token '|'\n");
-            }
+            if (check_rd(str, i))
+                error = printf("syntax error near unexpected token `|'\n");
         }
         else if (str[i] == '<')
         {
-            if (check_redirect_in(str, i))
-            {
-                error = printf("syntax error near unexpected token '<'\n");
-            }
+            if (is_redirection(str, i))
+                error = printf("syntax error near unexpected token `<'\n");
             else if (str[i + 1] == '<' && str[i + 2] == '<')
-            {
                 error = printf("syntax error near unexpected token '<<'\n");
-            }
         }
-
         if (error != 0)
-        {
-            return 1;
-        }
-
+            return (1);
         i++;
     }
-
-    return 0;
+    return (0);
 }
 int	break_token(t_tokens *tokens, char *str)
 {
@@ -917,6 +903,32 @@ void	is_command(char *input, int error, t_env *env)
 		}
 	}
 }
+
+/*int	main(int argc, char **argv, char **env)
+{
+	(void)argc;
+	(void)argv;
+	t_tokens	*tokens = NULL;
+	char		*input;
+	int			err;
+	t_env		my_env;
+
+	hola(env, &my_env);
+	//initialize_operator_types();
+	while (1)
+	{
+		input = readline("> ");
+		if (!input)
+			exit(0);
+
+		err = parser(&tokens, input, env);
+		if (tokens != NULL)
+		{
+			is_command(input, err, &my_env);
+		}
+	}
+	return (0);
+}*/
 
 int main()
 {

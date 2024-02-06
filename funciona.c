@@ -6,7 +6,7 @@
 /*   By: agrimald <agrimald@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:05:35 by agrimald          #+#    #+#             */
-/*   Updated: 2024/02/02 17:36:15 by agrimald         ###   ########.fr       */
+/*   Updated: 2024/02/06 17:06:16 by agrimald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ int dst_dots(char *str, char dot);
 int add_words(t_tokens *tokens, char *str, size_t len, int type);
 int is_marks(t_tokens *tokens, char *str);
 int is_space(t_tokens *tokens, char *str);
+char	*delete_space(char *str);
 t_tokens *init_token(char **env);
 int matrixify(t_tokens *tokens);
 int	add_history(const char *str);
@@ -201,6 +202,7 @@ int	parse_string(t_tokens *tokens, char *str)
 
 int	parser(t_tokens **tokens, char *str, char **env)
 {
+	str = delete_space(str);
 	if (!*tokens)
 	{
 		*tokens = init_token(env);
@@ -280,6 +282,19 @@ int	is_space(t_tokens *tokens, char *str)
 		i++;
 	add_words(tokens, " ", 1, 4);
 	return (i);
+}
+
+char	*delete_space(char *str)
+{
+	int i;
+
+	i = strlen(str) - 1;
+	while (i >= 0 && str[i] == ' ')
+	{
+		str[i] = '\0';
+		i--;
+	}
+	return (str);
 }
 
 t_tokens	*init_token(char **env)
@@ -904,7 +919,7 @@ void	is_command(char *input, int error, t_env *env)
 	}
 }
 
-/*int	main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **env)
 {
 	(void)argc;
 	(void)argv;
@@ -928,9 +943,9 @@ void	is_command(char *input, int error, t_env *env)
 		}
 	}
 	return (0);
-}*/
+}
 
-int main()
+/*int main()
 {
     char *env[] = {"VAR1=value1", "VAR2=value2", NULL}; // Ejemplo de entorno
 
@@ -966,4 +981,4 @@ int main()
     free_tokens(tokens);
 
     return 0;
-}
+}*/
